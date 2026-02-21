@@ -71,8 +71,8 @@ const uploadDocument = async (req, res, next) => {
                 // 1. Extract text from PDF
                 const { text, numPages } = await extractTextFromPDF(req.file.path);
 
-                // 2. Chunk text
-                const chunks = chunkText(text, 2000, 400);
+                // 2. Chunk text (smaller chunks for better semantic matching)
+                const chunks = chunkText(text, 800, 200);
                 if (chunks.length === 0) throw new Error('No text could be extracted from this PDF');
 
                 // 3. Generate embeddings

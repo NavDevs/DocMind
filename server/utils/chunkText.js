@@ -15,13 +15,19 @@ function chunkText(text, chunkSize = 2000, overlap = 400) {
         const end = Math.min(start + chunkSize, cleanText.length);
         let sliceEnd = end;
 
-        // Backtrack to last sentence boundary to avoid cutting mid-sentence
+        // 1. Try paragraph boundary (double newline)
         if (end < cleanText.length) {
-            const lastPeriod = cleanText.lastIndexOf('.', end);
-            const lastNewline = cleanText.lastIndexOf('\n', end);
-            const boundary = Math.max(lastPeriod, lastNewline);
-            if (boundary > start + chunkSize * 0.5) {
-                sliceEnd = boundary + 1;
+            const lastParagraph = cleanText.lastIndexOf('\n\n', end);
+            if (lastParagraph > start + chunkSize * 0.4) {
+                sliceEnd = lastParagraph + 2;
+            } else {
+                // 2. Fallback to sentence or single newline
+                const lastPeriod = cleanText.lastIndexOf('. ', end);
+                const lastNewline = cleanText.lastIndexOf('\n', end);
+                const boundary = Math.max(lastPeriod, lastNewline);
+                if (boundary > start + chunkSize * 0.5) {
+                    sliceEnd = boundary + 1;
+                }
             }
         }
 

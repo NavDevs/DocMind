@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    height: 64px;
+    height: var(--navbar-height);
     background: rgba(8, 12, 26, 0.85);
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(16px);
@@ -107,27 +107,27 @@
     display: none;
     flex-direction: column;
     justify-content: center;
-    gap: 5px;
-    width: 38px;
-    height: 38px;
-    padding: 8px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
     cursor: pointer;
     transition: var(--transition);
 }
 
 .hamburger:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .hamburger span {
     display: block;
     width: 100%;
     height: 2px;
-    background: var(--text-secondary);
+    background: #ffffff;
     border-radius: 2px;
     transition: all 0.25s ease;
     transform-origin: center;
@@ -135,7 +135,7 @@
 
 /* Animate to X */
 .hamburger.open span:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+    transform: translateY(8px) rotate(45deg);
 }
 
 .hamburger.open span:nth-child(2) {
@@ -144,7 +144,7 @@
 }
 
 .hamburger.open span:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+    transform: translateY(-8px) rotate(-45deg);
 }
 
 /* ── Mobile Overlay & Drawer ── */

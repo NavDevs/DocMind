@@ -6,7 +6,7 @@ const User = require('../models/User');
 const Document = require('../models/Document');
 
 const TOP_K = 8;
-const SIMILARITY_THRESHOLD = 0.25; // Higher threshold for better relevance filtering
+const SIMILARITY_THRESHOLD = 0.35; // Increased threshold to reject irrelevant chunks
 
 /**
  * Main RAG pipeline: embed question → retrieve chunks → build prompt → LLM answer
@@ -39,7 +39,7 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
     let matches = vectorStore.query(namespace, questionVector, TOP_K, SIMILARITY_THRESHOLD);
 
     // 3. Determine if question is document-related based on match quality
-    const hasStrongMatches = matches.length > 0 && matches[0].score > 0.35;
+    const hasStrongMatches = matches.length > 0 && matches[0].score > 0.50;
     const hasAnyMatches = matches.length > 0;
 
     // 4. Build document context
@@ -65,32 +65,17 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
         }
     }
 
-    // 5. Construct system prompt based on mode
-    const systemPrompt = mode === 'document'
-        ? `You are DocMind, an expert AI document assistant. You are currently helping the user analyze their uploaded document.
+    // 5. Construct system prompt
+    // ALWAYS force document strictness — remove the general knowledge fallback that causes hallucinations
+    const systemPrompt = `You are DocMind, an expert AI document assistant.
 
-RULES FOR DOCUMENT QUESTIONS:
-- Answer the user's question using the provided document context below.
-- Be extremely precise and accurate. Quote exact text from the sources when possible.
-- Cite your sources using [Source N] notation (e.g., "According to [Source 1]...").
-- If the document context partially answers the question, provide what you can and note what's missing.
-- Structure your answers with clear headers, bullet points, and formatting for readability.
-- If the answer is truly not in the provided context, say so clearly, then offer a helpful general answer if you can.
-
-RULES FOR GENERAL QUESTIONS:
-- If the user asks a general question (greetings, general knowledge, how-to, etc.), answer it helpfully using your own knowledge.
-- Be friendly, conversational, and informative.
-- You are not limited to only document content — you are a smart AI assistant.
-
-Format all answers in clean, readable markdown.`
-        : `You are DocMind, a smart and friendly AI assistant. You are currently in a chat session about a document the user uploaded.
-
-YOUR CAPABILITIES:
-- You can answer ANY question — general knowledge, coding, math, science, history, or anything else.
-- When the user asks about their document, use any provided context to give precise answers.
-- Be helpful, accurate, and conversational.
-- Format your answers in clean, readable markdown with headers, bullet points, and code blocks where appropriate.
-- Give thorough, detailed explanations unless asked to be brief.`;
+CRITICAL RULES:
+1. You MUST answer the user's question ONLY using the provided document context below.
+2. If the answer is NOT in the context, you MUST say: "I cannot find the answer to this in the document." Do NOT make up information.
+3. Quote exact text from the sources whenever possible to prove your answer.
+4. Structure your answers with clear formatting (bullet points, bold text) for readability. Do NOT use markdown headers like ###.
+5. If the document context partially answers the question, provide what you can and explicitly note what is missing.
+6. Do NOT answer general knowledge questions using your own knowledge. Always ground your answer in the user's document.`;
 
     // 6. Build messages array with chat history
     const messages = [
@@ -119,8 +104,8 @@ YOUR CAPABILITIES:
     const completion = await client.chat.completions.create({
         model,
         messages,
-        temperature: 0.4,
-        max_tokens: 2048,
+        temperature: 0.2, // Lower temperature for more factual, deterministic answers
+        max_tokens: 3000, // Increased to allow full table extraction
     });
 
     const answer = completion.choices[0].message.content;

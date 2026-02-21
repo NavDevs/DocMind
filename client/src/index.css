@@ -38,6 +38,10 @@
   --shadow-glow: 0 0 30px var(--accent-glow);
 
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout constants */
+  --navbar-height: 64px;
+  --chat-header-height: 52px;
 }
 
 /* ── Reset & Base ── */
@@ -290,23 +294,7 @@ a:hover {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.badge-high {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
 
-.badge-medium {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--warning);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.badge-low {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--danger);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
 
 /* ── Layout ── */
 .page-container {
@@ -316,9 +304,8 @@ a:hover {
 }
 
 .page-content {
-  padding-top: 80px;
-  /* navbar height */
-  min-height: 100vh;
+  padding-top: calc(var(--navbar-height) + 16px);
+  min-height: 100dvh;
 }
 
 .section {

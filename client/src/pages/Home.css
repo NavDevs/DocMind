@@ -1,5 +1,5 @@
 .home-page {
-    padding-top: 68px;
+    padding-top: var(--navbar-height);
 }
 
 /* Hero */
@@ -239,8 +239,18 @@
         grid-template-columns: 1fr;
     }
 
+    .hero-section {
+        text-align: center;
+    }
+
+    .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .hero-actions {
         flex-direction: column;
+        align-items: center;
     }
 
     .hero-actions .btn {
@@ -251,6 +261,7 @@
     .hero-stats {
         flex-wrap: wrap;
         gap: 12px;
+        justify-content: center;
     }
 
     .stat-divider {

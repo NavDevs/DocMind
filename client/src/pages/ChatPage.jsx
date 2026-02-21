@@ -4,11 +4,34 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import './ChatPage.css';
 
-const ConfidenceBadge = ({ score }) => {
-    if (score === 0 || score === null) return null;
-    const level = score >= 0.75 ? 'high' : score >= 0.5 ? 'medium' : 'low';
-    const label = level.charAt(0).toUpperCase() + level.slice(1);
-    return <span className={`badge badge-${level}`}>● {label} ({(score * 100).toFixed(0)}%)</span>;
+const formatContent = (text) => {
+    if (!text) return '';
+    // Strip ### markdown headers → bold text, parse **bold** text, and handle line breaks
+    return text
+        .split('\n')
+        .map((line, i) => {
+            const headerMatch = line.match(/^#{1,3}\s+(.*)/);
+            if (headerMatch) {
+                return <div key={i} style={{ fontWeight: 700, marginTop: i > 0 ? '0.75rem' : 0, marginBottom: '0.25rem' }}>{headerMatch[1]}</div>;
+            }
+
+            // Parse **bold** text inline
+            if (line.includes('**')) {
+                const parts = line.split(/(\*\*.*?\*\*)/g);
+                return (
+                    <div key={i}>
+                        {parts.map((part, j) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                                return <strong key={j}>{part.slice(2, -2)}</strong>;
+                            }
+                            return <span key={j}>{part}</span>;
+                        })}
+                    </div>
+                );
+            }
+
+            return <div key={i}>{line || '\u00A0'}</div>;
+        });
 };
 
 const SourcePanel = ({ sources }) => {
@@ -106,7 +129,7 @@ export default function ChatPage() {
     if (docLoading) return <div className="flex-center" style={{ height: '100vh' }}><div className="spinner spinner-lg" /></div>;
 
     return (
-        <div className="chat-page page-content">
+        <div className="chat-page">
             {/* Header */}
             <div className="chat-header">
                 <div className="page-container flex-between">
@@ -129,7 +152,7 @@ export default function ChatPage() {
                 </div>
             </div>
 
-            <div className="chat-layout page-container">
+            <div className="chat-layout">
                 {/* Messages Panel */}
                 <div className="messages-panel">
                     <div className="messages-scroll">
@@ -161,10 +184,9 @@ export default function ChatPage() {
                             >
                                 <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
                                 <div className="message-body">
-                                    <div className="message-content">{msg.content}</div>
+                                    <div className="message-content">{msg.role === 'assistant' ? formatContent(msg.content) : msg.content}</div>
                                     {msg.role === 'assistant' && (
                                         <div className="message-footer">
-                                            <ConfidenceBadge score={msg.confidenceScore} />
                                             {msg.sources?.length > 0 && (
                                                 <span className="sources-hint">📌 {msg.sources.length} source{msg.sources.length > 1 ? 's' : ''}</span>
                                             )}
