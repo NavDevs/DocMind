@@ -29,7 +29,7 @@ function initializeFirebaseAdmin() {
         adminDB = admin.database();
         adminFirestore = admin.firestore();
 
-        console.log('🔥 Firebase Admin initialized (Auth, RTDB, Firestore)');
+        console.log(`🔥 Firebase Admin initialized for project: ${serviceAccount.project_id}`);
     } catch (err) {
         console.error('❌ Firebase Admin init failed:', err.message);
     }
@@ -39,8 +39,12 @@ function initializeFirebaseAdmin() {
  * Sync user profile to Firestore users collection
  */
 async function syncUserToFirestore(user) {
-    if (!adminFirestore || !user) return;
+    if (!adminFirestore || !user) {
+        console.warn('⚠️ Firestore Sync Skipped: adminFirestore or user missing');
+        return;
+    }
     try {
+        console.log(`📡 Syncing user ${user.email} to Firestore...`);
         await adminFirestore.collection('users').doc(user._id.toString()).set({
             name: user.name,
             email: user.email,
@@ -48,8 +52,9 @@ async function syncUserToFirestore(user) {
             lastActive: admin.firestore.FieldValue.serverTimestamp(),
             mongoId: user._id.toString()
         }, { merge: true });
+        console.log(`✅ User ${user.email} synced successfully`);
     } catch (err) {
-        console.error('Firestore User Sync Error:', err.message);
+        console.error('❌ Firestore User Sync Error:', err.message);
     }
 }
 
@@ -57,16 +62,21 @@ async function syncUserToFirestore(user) {
  * Log a user event to Firestore userActivity collection
  */
 async function logActivityToFirestore(userId, type, detail = {}) {
-    if (!adminFirestore || !userId) return;
+    if (!adminFirestore || !userId) {
+        console.warn('⚠️ Firestore Activity Log Skipped: adminFirestore or userId missing');
+        return;
+    }
     try {
+        console.log(`📡 Logging activity [${type}] for user ${userId}...`);
         await adminFirestore.collection('userActivity').add({
             userId: userId.toString(),
             type,
             ...detail,
             timestamp: admin.firestore.FieldValue.serverTimestamp()
         });
+        console.log(`✅ Activity [${type}] logged successfully`);
     } catch (err) {
-        console.error('Firestore Activity Log Error:', err.message);
+        console.error('❌ Firestore Activity Log Error:', err.message);
     }
 }
 

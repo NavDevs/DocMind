@@ -18,15 +18,20 @@ const askQuestion = async (req, res, next) => {
         if (doc.status !== 'ready')
             return res.status(400).json({ success: false, message: `Document is not ready (status: ${doc.status})` });
 
-        // Run RAG pipeline
+        // Load chat history for conversational context
+        const existingChat = await Chat.findOne({ documentId, userId: req.user._id });
+        const chatHistory = existingChat?.messages || [];
+
+        // Run RAG pipeline with conversation history
         const { answer, sources, confidenceScore, tokensUsed } = await answerQuestion(
             documentId,
             req.user._id,
-            question.trim()
+            question.trim(),
+            chatHistory
         );
 
         // Append to chat history
-        let chat = await Chat.findOne({ documentId, userId: req.user._id });
+        let chat = existingChat;
         if (!chat) {
             chat = new Chat({ documentId, userId: req.user._id, messages: [] });
         }

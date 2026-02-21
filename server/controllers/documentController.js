@@ -16,16 +16,21 @@ const { getAdminFirestore, logActivityToFirestore } = require('../config/firebas
  */
 async function writeStatusToFirestore(userId, docId, status, extra = {}) {
     const db = getAdminFirestore();
-    if (!db) return;
+    if (!db) {
+        console.warn('⚠️ Firestore Status Write Skipped: db not initialized');
+        return;
+    }
     try {
+        console.log(`📡 Writing status [${status}] for doc ${docId} to Firestore...`);
         await db.collection('docStatus').doc(docId).set({
             userId,
             status,
             ...extra,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
+        console.log(`✅ Status [${status}] for doc ${docId} written successfully`);
     } catch (err) {
-        console.error('Error writing to Firestore:', err.message);
+        console.error('❌ Error writing to Firestore:', err.message);
     }
 }
 
