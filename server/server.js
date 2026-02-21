@@ -15,6 +15,7 @@ const authRoutes = require('./routes/authRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const collectionRoutes = require('./routes/collectionRoutes');
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/collections', collectionRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

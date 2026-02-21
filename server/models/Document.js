@@ -7,6 +7,12 @@ const documentSchema = new mongoose.Schema({
         required: true,
         index: true,
     },
+    collectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Collection',
+        default: null,
+        index: true,
+    },
     originalName: {
         type: String,
         required: true,

@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const admin = require('firebase-admin');
 const Document = require('../models/Document');
 const Analytics = require('../models/Analytics');
 const { extractTextFromPDF } = require('../services/pdfService');
@@ -7,16 +8,25 @@ const { chunkText } = require('../utils/chunkText');
 const { embedTexts } = require('../services/embeddingService');
 const vectorStore = require('../services/vectorService');
 const { generateSummary } = require('../services/summaryService');
-const { getAdminDB } = require('../config/firebase');
+const { getAdminFirestore } = require('../config/firebase');
 
 /**
- * Write document status to Firebase Realtime Database for live UI updates.
+ * Write document status to Cloud Firestore for live UI updates.
  * No-op if Firebase is not configured.
  */
-function writeStatusToRTDB(userId, docId, status, extra = {}) {
-    const db = getAdminDB();
+async function writeStatusToFirestore(userId, docId, status, extra = {}) {
+    const db = getAdminFirestore();
     if (!db) return;
-    db.ref(`docs/${userId}/${docId}`).update({ status, ...extra, updatedAt: Date.now() });
+    try {
+        await db.collection('docStatus').doc(docId).set({
+            userId,
+            status,
+            ...extra,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    } catch (err) {
+        console.error('Error writing to Firestore:', err.message);
+    }
 }
 
 // POST /api/documents/upload
@@ -24,8 +34,11 @@ const uploadDocument = async (req, res, next) => {
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'No PDF file uploaded' });
 
+        const { collectionId } = req.body;
+
         const doc = await Document.create({
             userId: req.user._id,
+            collectionId: collectionId || null,
             originalName: req.file.originalname,
             storagePath: req.file.path,
             fileSize: req.file.size,
@@ -35,8 +48,8 @@ const uploadDocument = async (req, res, next) => {
         // Respond immediately — process async
         res.status(202).json({ success: true, message: 'Upload received, processing...', document: doc });
 
-        // Write initial status to Firebase RTDB for real-time UI updates
-        writeStatusToRTDB(req.user._id.toString(), doc._id.toString(), 'processing');
+        // Write initial status to Firebase Firestore for real-time UI updates
+        writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing');
 
         // === Async ingestion pipeline ===
         (async () => {
@@ -79,8 +92,8 @@ const uploadDocument = async (req, res, next) => {
                     vectorNamespace: namespace,
                 });
 
-                // 7. Push final status to Firebase RTDB → client updates card instantly
-                writeStatusToRTDB(req.user._id.toString(), doc._id.toString(), 'ready', {
+                // 7. Push final status to Firebase Firestore → client updates card instantly
+                writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'ready', {
                     pageCount: numPages,
                     chunkCount: chunks.length,
                 });
@@ -95,8 +108,8 @@ const uploadDocument = async (req, res, next) => {
             } catch (procErr) {
                 console.error(`❌ Processing failed for doc ${doc._id}:`, procErr.message);
                 await Document.findByIdAndUpdate(doc._id, { status: 'failed', errorMessage: procErr.message });
-                // Push failure status to Firebase RTDB
-                writeStatusToRTDB(req.user._id.toString(), doc._id.toString(), 'failed');
+                // Push failure status to Firebase Firestore
+                writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'failed');
             }
         })();
     } catch (err) {

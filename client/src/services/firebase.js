@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -23,7 +23,7 @@ let googleProvider = null;
 if (isConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
-    db = getDatabase(app);
+    db = getFirestore(app);
     googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 } else {

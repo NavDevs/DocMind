@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 
 let adminAuth = null;
 let adminDB = null;
+let adminFirestore = null;
 
 /**
  * Initialize Firebase Admin SDK.
@@ -26,7 +27,9 @@ function initializeFirebaseAdmin() {
 
         adminAuth = admin.auth();
         adminDB = admin.database();
-        console.log('🔥 Firebase Admin initialized');
+        adminFirestore = admin.firestore();
+
+        console.log('🔥 Firebase Admin initialized (Auth, RTDB, Firestore)');
     } catch (err) {
         console.error('❌ Firebase Admin init failed:', err.message);
     }
@@ -34,5 +37,6 @@ function initializeFirebaseAdmin() {
 
 const getAdminAuth = () => adminAuth;
 const getAdminDB = () => adminDB;
+const getAdminFirestore = () => adminFirestore;
 
-module.exports = { initializeFirebaseAdmin, getAdminAuth, getAdminDB };
+module.exports = { initializeFirebaseAdmin, getAdminAuth, getAdminDB, getAdminFirestore };
