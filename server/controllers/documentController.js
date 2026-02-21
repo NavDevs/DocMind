@@ -8,7 +8,7 @@ const { chunkText } = require('../utils/chunkText');
 const { embedTexts } = require('../services/embeddingService');
 const vectorStore = require('../services/vectorService');
 const { generateSummary } = require('../services/summaryService');
-const { getAdminFirestore } = require('../config/firebase');
+const { getAdminFirestore, logActivityToFirestore } = require('../config/firebase');
 
 /**
  * Write document status to Cloud Firestore for live UI updates.
@@ -45,11 +45,20 @@ const uploadDocument = async (req, res, next) => {
             status: 'processing',
         });
 
-        // Respond immediately — process async
-        res.status(202).json({ success: true, message: 'Upload received, processing...', document: doc });
+        // Write initial status to Firestore for real-time tracking
+        await writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing', {
+            fileName: req.file.originalname,
+        });
 
-        // Write initial status to Firebase Firestore for real-time UI updates
-        writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing');
+        // Log upload activity
+        await logActivityToFirestore(req.user._id, 'document_upload', {
+            documentId: doc._id.toString(),
+            fileName: doc.originalName,
+            collectionId: doc.collectionId
+        });
+
+        // Respond immediately — process async
+        res.status(201).json({ success: true, document: doc });
 
         // === Async ingestion pipeline ===
         (async () => {

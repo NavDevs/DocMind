@@ -35,8 +35,50 @@ function initializeFirebaseAdmin() {
     }
 }
 
+/**
+ * Sync user profile to Firestore users collection
+ */
+async function syncUserToFirestore(user) {
+    if (!adminFirestore || !user) return;
+    try {
+        await adminFirestore.collection('users').doc(user._id.toString()).set({
+            name: user.name,
+            email: user.email,
+            plan: user.plan || 'free',
+            lastActive: admin.firestore.FieldValue.serverTimestamp(),
+            mongoId: user._id.toString()
+        }, { merge: true });
+    } catch (err) {
+        console.error('Firestore User Sync Error:', err.message);
+    }
+}
+
+/**
+ * Log a user event to Firestore userActivity collection
+ */
+async function logActivityToFirestore(userId, type, detail = {}) {
+    if (!adminFirestore || !userId) return;
+    try {
+        await adminFirestore.collection('userActivity').add({
+            userId: userId.toString(),
+            type,
+            ...detail,
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (err) {
+        console.error('Firestore Activity Log Error:', err.message);
+    }
+}
+
 const getAdminAuth = () => adminAuth;
 const getAdminDB = () => adminDB;
 const getAdminFirestore = () => adminFirestore;
 
-module.exports = { initializeFirebaseAdmin, getAdminAuth, getAdminDB, getAdminFirestore };
+module.exports = {
+    initializeFirebaseAdmin,
+    getAdminAuth,
+    getAdminDB,
+    getAdminFirestore,
+    syncUserToFirestore,
+    logActivityToFirestore
+};

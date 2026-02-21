@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Analytics = require('../models/Analytics');
 const { signToken } = require('../middleware/authMiddleware');
+const { syncUserToFirestore, logActivityToFirestore } = require('../config/firebase');
 
 // POST /api/auth/register
 const register = async (req, res, next) => {
@@ -16,6 +17,11 @@ const register = async (req, res, next) => {
         await Analytics.create({ userId: user._id, event: 'login', tokensUsed: 0 });
 
         const token = signToken(user._id);
+
+        // Sync to Firestore & Log
+        await syncUserToFirestore(user);
+        await logActivityToFirestore(user._id, 'register');
+
         res.status(201).json({ success: true, token, user });
     } catch (err) {
         next(err);
@@ -36,6 +42,11 @@ const login = async (req, res, next) => {
         await Analytics.create({ userId: user._id, event: 'login', tokensUsed: 0 });
 
         const token = signToken(user._id);
+
+        // Sync to Firestore & Log
+        await syncUserToFirestore(user);
+        await logActivityToFirestore(user._id, 'login');
+
         res.json({ success: true, token, user });
     } catch (err) {
         next(err);
@@ -53,6 +64,10 @@ const getMe = async (req, res) => {
 const firebaseAuth = async (req, res) => {
     try {
         const token = signToken(req.user._id);
+
+        // Profiles are synced in middleware, but we log the login here
+        await logActivityToFirestore(req.user._id, 'login_google');
+
         res.json({ success: true, token, user: req.user });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Firebase auth failed' });
@@ -60,4 +75,3 @@ const firebaseAuth = async (req, res) => {
 };
 
 module.exports = { register, login, getMe, firebaseAuth };
-

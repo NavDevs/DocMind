@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { getAdminAuth } = require('../config/firebase');
+const { getAdminAuth, syncUserToFirestore } = require('../config/firebase');
 
 const signToken = (id) =>
     jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -35,6 +35,7 @@ const authenticateJWT = async (req, res, next) => {
                     });
                 }
                 req.user = user;
+                syncUserToFirestore(user); // Sync to Firestore
                 return next();
             } catch (firebaseErr) {
                 // Not a Firebase token — fall through to JWT check
@@ -48,6 +49,7 @@ const authenticateJWT = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'User not found' });
         }
         req.user = user;
+        syncUserToFirestore(user); // Sync to Firestore
         next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {

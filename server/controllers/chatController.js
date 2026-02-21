@@ -1,6 +1,7 @@
 const Chat = require('../models/Chat');
 const Document = require('../models/Document');
 const { answerQuestion } = require('../services/ragService');
+const { logActivityToFirestore } = require('../config/firebase');
 
 // POST /api/chat/:documentId
 const askQuestion = async (req, res, next) => {
@@ -33,6 +34,12 @@ const askQuestion = async (req, res, next) => {
         chat.messages.push({ role: 'user', content: question.trim(), timestamp: new Date() });
         chat.messages.push({ role: 'assistant', content: answer, sources, confidenceScore, timestamp: new Date() });
         await chat.save();
+
+        // Log chat activity
+        await logActivityToFirestore(req.user._id, 'chat_question', {
+            documentId,
+            tokensUsed
+        });
 
         res.json({ success: true, answer, sources, confidenceScore, tokensUsed });
     } catch (err) {
