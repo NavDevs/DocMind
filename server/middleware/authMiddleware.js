@@ -36,7 +36,7 @@ const authenticateJWT = async (req, res, next) => {
                 }
                 req.user = user;
                 return next();
-            } catch {
+            } catch (firebaseErr) {
                 // Not a Firebase token — fall through to JWT check
             }
         }

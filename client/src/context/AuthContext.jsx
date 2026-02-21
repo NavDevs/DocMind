@@ -37,21 +37,25 @@ export const AuthProvider = ({ children }) => {
     const loginWithGoogle = async () => {
         if (!isConfigured) throw new Error('Firebase is not configured. Add VITE_FIREBASE_* to client/.env');
 
-        // 1. Sign in via Google popup
-        const result = await signInWithPopup(auth, googleProvider);
-        const firebaseToken = await result.user.getIdToken();
+        try {
+            // 1. Sign in via Google popup
+            const result = await signInWithPopup(auth, googleProvider);
+            const firebaseToken = await result.user.getIdToken();
 
-        // 2. Exchange Firebase ID token for our app's JWT
-        const { data } = await api.post('/auth/firebase', null, {
-            headers: { Authorization: `Bearer ${firebaseToken}` },
-        });
+            // 2. Exchange Firebase ID token for our app's JWT
+            const { data } = await api.post('/auth/firebase', null, {
+                headers: { Authorization: `Bearer ${firebaseToken}` },
+            });
 
-        // 3. Store and set session
-        localStorage.setItem('docmind_token', data.token);
-        setToken(data.token);
-        setUser(data.user);
+            // 3. Store and set session
+            localStorage.setItem('docmind_token', data.token);
+            setToken(data.token);
+            setUser(data.user);
 
-        return data.user;
+            return data.user;
+        } catch (err) {
+            throw err;
+        }
     };
 
     const logout = async () => {
