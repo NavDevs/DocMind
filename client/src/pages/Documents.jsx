@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useDropzone } from 'react-dropzone';
 import api from '../services/api';
+import { db, isConfigured } from '../services/firebase';
+import { ref, onValue } from 'firebase/database';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './Documents.css';
 
@@ -24,6 +24,7 @@ export default function Documents() {
     const [docs, setDocs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const { user } = useAuth();
 
     const fetchDocs = useCallback(async () => {
         try {
@@ -38,17 +39,29 @@ export default function Documents() {
 
     useEffect(() => {
         fetchDocs();
-        // Poll for status updates on processing docs
-        const interval = setInterval(() => {
-            setDocs(prev => {
-                if (prev.some(d => d.status === 'processing')) {
-                    fetchDocs();
-                }
-                return prev;
+
+        // 🟢 True Real-time Sync via Firebase
+        if (isConfigured && db && user) {
+            const docsRef = ref(db, `docs/${user._id}`);
+
+            // Listen for any changes to this user's document statuses
+            const unsubscribe = onValue(docsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                setDocs(prev => prev.map(doc => {
+                    const update = data[doc._id];
+                    if (update && update.updatedAt) {
+                        // Merge the Firebase real-time status into our state
+                        return { ...doc, ...update };
+                    }
+                    return doc;
+                }));
             });
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [fetchDocs]);
+
+            return () => unsubscribe();
+        }
+    }, [fetchDocs, user]);
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const file = acceptedFiles[0];
