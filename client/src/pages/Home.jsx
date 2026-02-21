@@ -96,11 +96,23 @@ export default function Home() {
             <section className="cta-section">
                 <div className="page-container">
                     <div className="cta-card glass-card">
-                        <h2>Ready to talk to your documents?</h2>
-                        <p>Free to get started — no credit card required.</p>
-                        <Link to="/register" className="btn btn-primary btn-lg animate-pulse-glow">
-                            Create Free Account →
-                        </Link>
+                        {isAuthenticated ? (
+                            <>
+                                <h2>Welcome back! Ready to continue?</h2>
+                                <p>Your documents are waiting for you.</p>
+                                <Link to="/documents" className="btn btn-primary btn-lg animate-pulse-glow">
+                                    Go to Documents →
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <h2>Ready to talk to your documents?</h2>
+                                <p>Free to get started — no credit card required.</p>
+                                <Link to="/register" className="btn btn-primary btn-lg animate-pulse-glow">
+                                    Create Free Account →
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </section>
