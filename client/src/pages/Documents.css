@@ -153,28 +153,39 @@
 
 .collection-picker {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    width: fit-content;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
     position: relative;
     z-index: 1;
+    margin-bottom: 8px;
+}
+
+.collection-picker span {
+    font-size: 0.9rem;
+    font-weight: 600;
     color: var(--text-secondary);
 }
 
 .collection-picker select {
-    background: transparent;
-    border: none;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: 500;
     font-family: inherit;
     font-size: 0.95rem;
+    padding: 12px 16px;
+    width: 100%;
+    max-width: 400px;
     cursor: pointer;
     outline: none;
+    transition: var(--transition);
+}
+
+.collection-picker select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
 }
 
 .collection-picker select option {
@@ -430,14 +441,7 @@
         padding: 36px 16px;
     }
 
-    .collection-picker {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-        gap: 8px;
-    }
-
     .collection-picker select {
-        width: 100%;
+        max-width: 100%;
     }
 }
