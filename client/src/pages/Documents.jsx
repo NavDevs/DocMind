@@ -190,16 +190,7 @@ export default function Documents() {
                                 <span className="badge">{docs.length}</span>
                             </div>
 
-                            <div
-                                className={`collection-item ${activeCollectionId === 'uncategorized' ? 'active' : ''}`}
-                                onClick={() => setActiveCollectionId('uncategorized')}
-                            >
-                                <div className="flex-center">
-                                    <span className="color-dot" style={{ background: '#64748b' }}></span>
-                                    Uncategorized
-                                </div>
-                                <span className="badge">{docs.filter(d => !d.collectionId).length}</span>
-                            </div>
+
 
                             {collections.map(coll => (
                                 <div
