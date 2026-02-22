@@ -40,6 +40,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rate Limiting
+// Trust the reverse proxy (Render load balancer) so we get the real client IP
+app.set('trust proxy', 1);
 app.use('/api', rateLimiter);
 
 // Static file serving for uploads (optional preview)
