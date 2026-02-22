@@ -84,18 +84,29 @@ export default function Navbar() {
                 <div className="mobile-nav-links">
                     {isAuthenticated ? (
                         <>
-                            <div className="mobile-user-info">
-                                <div className="user-avatar">{user?.name?.[0]?.toUpperCase() || 'U'}</div>
-                                <span>{user?.name}</span>
+                            <div className="mobile-user-info" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '16px' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontWeight: 'bold' }}>My Profile</div>
+                                <div className="flex" style={{ gap: '12px', alignItems: 'center' }}>
+                                    <div className="user-avatar">{user?.name?.[0]?.toUpperCase() || 'U'}</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontWeight: '600', fontSize: '1rem' }}>{user?.name || 'User'}</span>
+                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{user?.email || ''}</span>
+                                    </div>
+                                </div>
                             </div>
                             <Link to="/documents" className={isActive('/documents')}>📄 Documents</Link>
                             <Link to="/analytics" className={isActive('/analytics')}>📊 Analytics</Link>
-                            <button className="btn btn-secondary w-full" onClick={handleLogout}>Logout</button>
+
+                            <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+                                <button className="btn btn-danger w-full" onClick={handleLogout} style={{ justifyContent: 'center' }}>
+                                    Sign Out
+                                </button>
+                            </div>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="btn btn-secondary w-full">Sign In</Link>
-                            <Link to="/register" className="btn btn-primary w-full">Get Started →</Link>
+                            <Link to="/login" className="btn btn-secondary w-full" style={{ justifyContent: 'center' }}>Sign In</Link>
+                            <Link to="/register" className="btn btn-primary w-full" style={{ justifyContent: 'center' }}>Get Started →</Link>
                         </>
                     )}
                 </div>
