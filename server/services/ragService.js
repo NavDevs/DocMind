@@ -6,7 +6,7 @@ const User = require('../models/User');
 const Document = require('../models/Document');
 
 const TOP_K = 8;
-const SIMILARITY_THRESHOLD = 0.35; // Increased threshold to reject irrelevant chunks
+const SIMILARITY_THRESHOLD = 0.10; // Lowered threshold because local TF-IDF scores are naturally lower than OpenAI
 
 /**
  * Main RAG pipeline: embed question → retrieve chunks → build prompt → LLM answer
