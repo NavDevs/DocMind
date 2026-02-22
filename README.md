@@ -6,6 +6,12 @@ DocMind is a full-stack **Retrieval-Augmented Generation (RAG)** application tha
 
 ---
 
+## 🌐 Live Links
+- **Frontend App**: [https://docmind-client.onrender.com](https://docmind-client.onrender.com)
+- **Backend API**: [https://docmind-server.onrender.com](https://docmind-server.onrender.com)
+
+---
+
 ## ✨ Features
 
 - 📄 **PDF Upload** — Drag & drop PDF documents for instant processing
