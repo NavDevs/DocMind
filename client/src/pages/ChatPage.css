@@ -287,20 +287,31 @@
     .chat-layout {
         flex-direction: column;
         padding: 0 16px;
+        /* Ensure it exactly fits the viewport minus headers */
+        height: calc(100dvh - var(--navbar-height) - var(--chat-header-height));
+        margin-top: calc(var(--navbar-height) + var(--chat-header-height));
+        overflow: hidden;
     }
 
     .messages-panel {
-        height: auto;
+        height: 100%;
         flex: 1;
         min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .messages-scroll {
+        flex: 1;
+        overflow-y: auto;
     }
 
     .chat-input-form {
-        position: sticky;
-        bottom: 0;
+        flex-shrink: 0;
         background: var(--bg-primary);
         padding: 10px 0 14px;
         z-index: 10;
+        border-top: 1px solid var(--border);
     }
 
     .sources-sidebar {
