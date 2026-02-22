@@ -268,6 +268,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    gap: 12px;
 }
 
 .doc-icon {
@@ -427,5 +428,16 @@
 
     .upload-zone {
         padding: 36px 16px;
+    }
+
+    .collection-picker {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .collection-picker select {
+        width: 100%;
     }
 }

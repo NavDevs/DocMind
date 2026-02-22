@@ -209,6 +209,7 @@
 /* ── Chat Input (pinned to bottom) ── */
 .chat-input-form {
     display: flex;
+    align-items: center;
     gap: 10px;
     padding: 12px 0 16px;
     border-top: 1px solid var(--border);
@@ -327,11 +328,35 @@
     }
 
     .chat-header .page-container {
-        padding: 0 12px;
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .chat-doc-name {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 60vw;
     }
 
     .chat-header .btn-sm {
-        padding: 5px 10px;
-        font-size: 0.75rem;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .chat-input-form {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .chat-input {
+        border-radius: var(--radius-lg);
+    }
+
+    .chat-input-form .btn-primary {
+        border-radius: var(--radius-lg);
+        padding: 0 20px;
     }
 }
