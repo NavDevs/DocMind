@@ -20,12 +20,12 @@
 .hero-badge {
     display: inline-block;
     padding: 6px 14px;
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--accent-light);
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
@@ -81,7 +81,7 @@
 
 .chat-preview-header {
     padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -114,7 +114,7 @@
 
 .preview-user {
     align-self: flex-end;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    background: var(--accent);
     color: #fff;
     padding: 10px 14px;
     border-radius: 14px 14px 4px 14px;
@@ -129,7 +129,7 @@
 }
 
 .preview-answer {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     padding: 12px 14px;
     border-radius: 4px 14px 14px 14px;
@@ -198,7 +198,10 @@
 .cta-card {
     text-align: center;
     padding: 60px 40px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
 }
 
 .cta-card h2 {

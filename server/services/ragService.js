@@ -32,7 +32,9 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
     }
 
     // 1. Embed the question
+    console.log('[RAG] Embedding question...');
     const questionVector = await embedQuery(question);
+    console.log('[RAG] Question embedded successfully. Vector length:', questionVector?.length);
 
     // 2. Retrieve relevant chunks from vector store
     const namespace = `doc_${documentId}`;
@@ -66,16 +68,13 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
     }
 
     // 5. Construct system prompt
-    // ALWAYS force document strictness — remove the general knowledge fallback that causes hallucinations
-    const systemPrompt = `You are DocMind, an expert AI document assistant.
+    const systemPrompt = `You are DocMind, an expert AI assistant.
 
 CRITICAL RULES:
-1. You MUST answer the user's question ONLY using the provided document context below.
-2. If the answer is NOT in the context, you MUST say: "I cannot find the answer to this in the document." Do NOT make up information.
-3. Quote exact text from the sources whenever possible to prove your answer.
-4. Structure your answers with clear formatting (bullet points, bold text) for readability. Do NOT use markdown headers like ###.
-5. If the document context partially answers the question, provide what you can and explicitly note what is missing.
-6. Do NOT answer general knowledge questions using your own knowledge. Always ground your answer in the user's document.`;
+1. If "Document Context" is provided, you MUST primarily use that context to answer the user's question, quoting exact text when possible.
+2. If the user's question is NOT related to the document context, or if no context is provided, you may answer using your general knowledge.
+3. If you use general knowledge, briefly mention that your answer is not based on the provided document.
+4. Structure your answers with clear formatting (bullet points, bold text) for readability. Do NOT use markdown headers like ###.`;
 
     // 6. Build messages array with chat history
     const messages = [
@@ -101,6 +100,7 @@ CRITICAL RULES:
     messages.push({ role: 'user', content: userMessage });
 
     // 7. Call Groq (or OpenAI fallback)
+    console.log('[RAG] Calling chat completions API with model:', model);
     const completion = await client.chat.completions.create({
         model,
         messages,

@@ -19,7 +19,7 @@
     right: 0;
     z-index: 90;
     height: var(--chat-header-height);
-    background: rgba(8, 12, 26, 0.92);
+    background: rgba(14, 17, 23, 0.92);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
@@ -116,7 +116,7 @@
 }
 
 .message.user .message-content {
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    background: var(--accent);
     color: #fff;
     border-radius: var(--radius-md) var(--radius-md) 4px var(--radius-md);
 }
@@ -125,6 +125,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
     border-radius: 4px var(--radius-md) var(--radius-md) var(--radius-md);
 }
 
@@ -260,7 +261,7 @@
 .source-num {
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--accent-light);
+    color: var(--accent);
 }
 
 .source-score {

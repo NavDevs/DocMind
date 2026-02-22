@@ -60,9 +60,8 @@ const STOPWORDS = new Set([
 
 async function embedTexts(texts) {
     const openai = getOpenAI();
-    const groq = getGroq();
 
-    if (!openai && !groq) {
+    if (!openai) {
         // Fall back to local TF-IDF embeddings (poor semantic quality)
         return texts.map(localEmbed);
     }
@@ -72,20 +71,10 @@ async function embedTexts(texts) {
 
     for (let i = 0; i < texts.length; i += batchSize) {
         const batch = texts.slice(i, i + batchSize);
-        let res;
-
-        // Prefer Groq's fast/free nomic model if available, else OpenAI
-        if (groq) {
-            res = await groq.embeddings.create({
-                model: 'nomic-embed-text-v1_5',
-                input: batch,
-            });
-        } else {
-            res = await openai.embeddings.create({
-                model: 'text-embedding-3-small',
-                input: batch,
-            });
-        }
+        const res = await openai.embeddings.create({
+            model: 'text-embedding-3-small',
+            input: batch,
+        });
 
         all.push(...res.data.map(d => d.embedding));
     }
