@@ -234,18 +234,7 @@ export default function Documents() {
 
                         {/* Upload Wrapper */}
                         <div className="upload-wrapper">
-                            <div className="collection-picker">
-                                <span>Upload to:</span>
-                                <select
-                                    value={targetCollectionId}
-                                    onChange={(e) => setTargetCollectionId(e.target.value)}
-                                >
-                                    <option value="">No Collection (Uncategorized)</option>
-                                    {collections.map(c => (
-                                        <option key={c._id} value={c._id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+
 
                             <div {...getRootProps()} className={`upload-zone glass-card ${isDragActive ? 'drag-active' : ''} ${uploading ? 'uploading' : ''}`}>
                                 <input {...getInputProps()} />
