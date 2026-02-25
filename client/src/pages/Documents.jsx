@@ -119,7 +119,13 @@ export default function Documents() {
     const onDrop = useCallback(async (acceptedFiles) => {
         const file = acceptedFiles[0];
         if (!file) return;
-        if (file.type !== 'application/pdf') {
+
+        // On some mobile devices (especially when uploading from Drive/iCloud), 
+        // the MIME type might be generic (e.g., application/octet-stream).
+        // So we also check the file extension as a fallback.
+        const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+
+        if (!isPdf) {
             toast.error('Only PDF files are supported');
             return;
         }
