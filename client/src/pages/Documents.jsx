@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import api from '../services/api';
-import { db, isConfigured } from '../services/firebase';
+import { db, auth, isConfigured } from '../services/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
