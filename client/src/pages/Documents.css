@@ -435,18 +435,25 @@
         overflow-x: auto;
         padding-bottom: 12px;
         gap: 12px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .collection-item {
         white-space: nowrap;
         border-radius: var(--radius-md);
         border-left: 1px solid transparent;
+        padding: 10px 14px;
+        font-size: 0.9rem;
     }
 
     .collection-item.active {
         border-left: 1px solid var(--border-strong);
         border-bottom: 3px solid var(--accent);
         border-radius: var(--radius-md) var(--radius-md) 4px 4px;
+    }
+
+    .delete-collection {
+        opacity: 0.8;
     }
 }
 
@@ -459,6 +466,7 @@
 @media (max-width: 600px) {
     .docs-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .docs-header {
@@ -466,21 +474,72 @@
         align-items: flex-start;
         gap: 12px;
         padding-bottom: 20px;
+        margin-bottom: 24px;
     }
 
     .docs-header h2 {
         font-size: 1.8rem;
     }
 
+    .docs-header p {
+        font-size: 0.95rem;
+    }
+
     .upload-wrapper {
         padding: 16px;
+        margin-bottom: 32px;
     }
 
     .upload-zone {
         padding: 36px 16px;
     }
 
+    .upload-icon {
+        font-size: 2.8rem;
+    }
+
+    .upload-title {
+        font-size: 1.05rem;
+    }
+
     .collection-picker select {
         max-width: 100%;
+    }
+
+    .doc-card {
+        padding: 20px;
+    }
+
+    .doc-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.8rem;
+    }
+
+    .doc-name {
+        font-size: 0.95rem;
+    }
+
+    .doc-actions {
+        gap: 8px;
+    }
+
+    .modal-content {
+        padding: 32px 24px;
+        max-width: 95vw;
+    }
+
+    .modal-content h3 {
+        font-size: 1.4rem;
+    }
+
+    .collections-sidebar .section-title {
+        font-size: 0.7rem;
+    }
+
+    .color-dot {
+        width: 8px;
+        height: 8px;
+        margin-right: 10px;
     }
 }

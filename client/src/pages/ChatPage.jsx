@@ -81,6 +81,7 @@ export default function ChatPage() {
     const [docLoading, setDocLoading] = useState(true);
     const [activeSources, setActiveSources] = useState([]);
     const [showSources, setShowSources] = useState(false);
+    const [showPdf, setShowPdf] = useState(false);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -151,7 +152,27 @@ export default function ChatPage() {
         }
     };
 
+    const handleOpenPdf = () => {
+        setShowPdf(true);
+    };
+
+    const handleClosePdf = () => {
+        setShowPdf(false);
+    };
+
     if (docLoading) return <div className="flex-center" style={{ height: '100vh' }}><div className="spinner spinner-lg" /></div>;
+
+    // Get PDF URL from document - extract relative path from storagePath
+    // storagePath is like: C:\...\server\uploads\userId\uuid.pdf
+    // We need: /uploads/userId/uuid.pdf
+    let pdfUrl = null;
+    if (doc?.storagePath) {
+        const uploadsIndex = doc.storagePath.indexOf('uploads');
+        if (uploadsIndex !== -1) {
+            const relativePath = doc.storagePath.substring(uploadsIndex);
+            pdfUrl = `/${relativePath.replace(/\\/g, '/')}`; // Convert backslashes to forward slashes
+        }
+    }
 
     return (
         <div className={`chat-page ${showSources ? 'sources-open' : ''}`}>
@@ -166,6 +187,15 @@ export default function ChatPage() {
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        {pdfUrl && (
+                            <button
+                                className={`btn btn-secondary btn-sm btn-pdf-toggle ${showPdf ? 'active' : ''}`}
+                                onClick={handleOpenPdf}
+                                title="View PDF"
+                            >
+                                📄 <span className="hide-mobile">PDF</span>
+                            </button>
+                        )}
                         <button
                             className={`btn btn-secondary btn-sm btn-sources-toggle ${showSources ? 'active' : ''}`}
                             onClick={() => setShowSources(!showSources)}
@@ -177,7 +207,34 @@ export default function ChatPage() {
                 </div>
             </div>
 
-            <div className="chat-layout">
+            <div className={`chat-layout ${showPdf ? 'pdf-open' : ''}`}>
+                {/* PDF Viewer Panel */}
+                {showPdf && pdfUrl && (
+                    <div className="pdf-viewer-panel">
+                        <div className="pdf-viewer-header">
+                            <h3>📄 {doc?.originalName}</h3>
+                            <div className="flex gap-2">
+                                <a 
+                                    href={pdfUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="btn btn-secondary btn-sm"
+                                >
+                                    🔗 Open in New Tab
+                                </a>
+                                <button className="btn-close" onClick={handleClosePdf}>✕</button>
+                            </div>
+                        </div>
+                        <div className="pdf-viewer-content">
+                            <iframe
+                                src={pdfUrl}
+                                title={doc?.originalName}
+                                className="pdf-iframe"
+                            />
+                        </div>
+                    </div>
+                )}
+
                 {/* Messages Panel */}
                 <div className="messages-panel">
                     <div className="messages-scroll">

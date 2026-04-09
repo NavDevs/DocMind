@@ -115,7 +115,43 @@
 
 /* Mobile */
 @media (max-width: 480px) {
+    .auth-page {
+        padding: 80px 16px 32px;
+    }
+
     .auth-card {
         padding: 32px 24px;
+        border-radius: var(--radius-lg);
+    }
+
+    .auth-icon {
+        font-size: 2.4rem;
+    }
+
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .auth-header p {
+        font-size: 0.88rem;
+    }
+
+    .auth-form {
+        gap: 14px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.88rem;
+    }
+
+    .btn-google {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+
+    .auth-footer {
+        font-size: 0.82rem;
+        margin-top: 20px;
     }
 }

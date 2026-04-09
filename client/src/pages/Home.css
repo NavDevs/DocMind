@@ -335,7 +335,7 @@
     .hero-section .page-container {
         grid-template-columns: 1fr;
         gap: 40px;
-        padding: 60px 24px;
+        padding: 60px 20px;
     }
 
     .hero-visual {
@@ -344,6 +344,15 @@
 
     .features-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .hero-actions {
+        gap: 12px;
+    }
+
+    .hero-stats {
+        gap: 20px;
     }
 }
 
@@ -354,11 +363,13 @@
 
     .hero-section {
         text-align: center;
+        min-height: 85vh;
     }
 
     .hero-subtitle {
         margin-left: auto;
         margin-right: auto;
+        font-size: 1rem;
     }
 
     .hero-actions {
@@ -387,5 +398,26 @@
 
     .section-header {
         margin-bottom: 48px;
+    }
+
+    .feature-card {
+        padding: 24px;
+    }
+
+    .features-section {
+        padding: 60px 0;
+    }
+
+    .cta-section {
+        padding: 60px 0 80px;
+    }
+
+    .preview-messages {
+        padding: 16px;
+    }
+
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 6px 14px;
     }
 }
