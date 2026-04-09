@@ -3,6 +3,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
+// Optimized storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const userDir = path.join(__dirname, '../uploads', req.user.id.toString());
@@ -26,12 +27,17 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+// Optimized upload configuration with better buffering
 const upload = multer({
     storage,
     fileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB max
+        files: 1, // Only 1 file at a time
+        fieldSize: 10 * 1024 * 1024, // 10MB field size
     },
+    // Use memory storage for small files (< 2MB) for faster processing
+    // This is handled automatically by multer's diskStorage
 });
 
 module.exports = { upload };

@@ -60,23 +60,22 @@ async function syncUserToFirestore(user) {
 
 /**
  * Log a user event to Firestore userActivity collection
+ * Non-blocking - failures are logged but don't interrupt flow
  */
 async function logActivityToFirestore(userId, type, detail = {}) {
     if (!adminFirestore || !userId) {
-        console.warn('⚠️ Firestore Activity Log Skipped: adminFirestore or userId missing');
         return;
     }
     try {
-        console.log(`📡 Logging activity [${type}] for user ${userId}...`);
         await adminFirestore.collection('userActivity').add({
             userId: userId.toString(),
             type,
             ...detail,
             timestamp: admin.firestore.FieldValue.serverTimestamp()
         });
-        console.log(`✅ Activity [${type}] logged successfully`);
     } catch (err) {
-        console.error('❌ Firestore Activity Log Error:', err.message);
+        // Log warning but don't fail the operation
+        console.warn('⚠️ Firestore activity log failed:', err.message);
     }
 }
 

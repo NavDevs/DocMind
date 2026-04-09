@@ -93,8 +93,13 @@ export default function ChatPage() {
                 ]);
                 setDoc(docRes.data.document);
                 setMessages(histRes.data.messages || []);
-            } catch {
-                toast.error('Failed to load document');
+            } catch (err) {
+                console.error('Error loading document:', err);
+                if (err.response?.status === 404) {
+                    toast.error('Document not found. It may have been deleted.');
+                } else {
+                    toast.error('Failed to load document. Please try again.');
+                }
             } finally {
                 setDocLoading(false);
             }

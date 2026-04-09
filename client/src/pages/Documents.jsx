@@ -8,12 +8,13 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './Documents.css';
 
-const StatusBadge = ({ status }) => (
-    <span className={`badge badge-${status}`}>
+const StatusBadge = ({ status, progress }) => (
+    <span className={`badge badge-${status}`} title={progress}>
         {status === 'processing' && <span className="spinner" style={{ width: 10, height: 10 }} />}
         {status === 'ready' && '✓'}
         {status === 'failed' && '✕'}
         {' '}{status.charAt(0).toUpperCase() + status.slice(1)}
+        {status === 'processing' && progress && <span style={{ marginLeft: 4, fontSize: 10 }}>{progress}</span>}
     </span>
 );
 
@@ -81,6 +82,15 @@ export default function Documents() {
                     }
                     return doc;
                 }));
+            }, (error) => {
+                // Handle permission errors gracefully
+                console.warn('Firestore listener error:', error.message);
+                if (error.code === 'permission-denied') {
+                    console.warn('⚠️ Firestore permissions not configured. Real-time updates disabled.');
+                    // Don't show error toast - this is non-critical
+                } else {
+                    console.error('Firestore sync error:', error);
+                }
             });
 
             return () => unsubscribe();
@@ -129,19 +139,32 @@ export default function Documents() {
             toast.error('Only PDF files are supported');
             return;
         }
+
+        // Check file size (10MB limit)
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            toast.error(`File too large. Maximum size is 10MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB`);
+            return;
+        }
+
         const formData = new FormData();
         formData.append('pdf', file);
         if (targetCollectionId) formData.append('collectionId', targetCollectionId);
 
         setUploading(true);
+        const loadingToast = toast.loading('Uploading PDF...');
+        
         try {
             const { data } = await api.post('/documents/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            toast.success('PDF uploaded! Processing...');
+            
+            toast.dismiss(loadingToast);
+            toast.success(`PDF uploaded! Processing will take a few seconds...`);
             setDocs(prev => [data.document, ...prev]);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Upload failed');
+            toast.dismiss(loadingToast);
+            toast.error(err.response?.data?.message || 'Upload failed. Please try again.');
         } finally {
             setUploading(false);
         }
@@ -292,7 +315,7 @@ export default function Documents() {
                                                         {collections.find(c => c._id === doc.collectionId)?.name || '...'}
                                                     </span>
                                                 )}
-                                                <StatusBadge status={doc.status} />
+                                                <StatusBadge status={doc.status} progress={doc.progress} />
                                             </div>
                                         </div>
                                         <div className="doc-name" title={doc.originalName}>{doc.originalName}</div>

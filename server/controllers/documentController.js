@@ -17,20 +17,19 @@ const { getAdminFirestore, logActivityToFirestore } = require('../config/firebas
 async function writeStatusToFirestore(userId, docId, status, extra = {}) {
     const db = getAdminFirestore();
     if (!db) {
-        console.warn('⚠️ Firestore Status Write Skipped: db not initialized');
+        // Silently skip if Firestore not configured - not critical
         return;
     }
     try {
-        console.log(`📡 Writing status [${status}] for doc ${docId} to Firestore...`);
         await db.collection('docStatus').doc(docId).set({
             userId,
             status,
             ...extra,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        console.log(`✅ Status [${status}] for doc ${docId} written successfully`);
     } catch (err) {
-        console.error('❌ Error writing to Firestore:', err.message);
+        // Log error but don't fail the upload process
+        console.warn('⚠️ Firestore status update failed:', err.message);
     }
 }
 
@@ -65,24 +64,46 @@ const uploadDocument = async (req, res, next) => {
         // Respond immediately — process async
         res.status(201).json({ success: true, document: doc });
 
-        // === Async ingestion pipeline ===
+        // === Async ingestion pipeline (optimized with parallel processing) ===
         (async () => {
             try {
+                // Update status to processing in Firestore
+                await writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing', {
+                    fileName: req.file.originalname,
+                    progress: 'Extracting text...',
+                });
+
                 // 1. Extract text from PDF
                 const { text, numPages } = await extractTextFromPDF(req.file.path);
+
+                // Update progress
+                await writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing', {
+                    progress: 'Analyzing document...',
+                });
 
                 // 2. Chunk text (smaller chunks for better semantic matching)
                 const chunks = chunkText(text, 800, 200);
                 if (chunks.length === 0) throw new Error('No text could be extracted from this PDF');
 
-                // 3. Generate embeddings
-                let embeddings = [];
-                try {
-                    embeddings = await embedTexts(chunks.map(c => c.text));
-                } catch (embErr) {
-                    console.warn('Embedding failed (no API key?):', embErr.message);
-                }
+                // 3. Run embeddings and summary in PARALLEL for faster processing
+                const [embeddingsResult, summaryResult] = await Promise.allSettled([
+                    // Embeddings (may use OpenAI or local TF-IDF)
+                    (async () => {
+                        try {
+                            const embeddings = await embedTexts(chunks.map(c => c.text));
+                            return embeddings;
+                        } catch (embErr) {
+                            console.warn('Embedding failed (no API key?):', embErr.message);
+                            return [];
+                        }
+                    })(),
+                    // Summary (uses Groq/OpenAI)
+                    generateSummary(chunks)
+                ]);
 
+                // Process embeddings result
+                const embeddings = embeddingsResult.status === 'fulfilled' ? embeddingsResult.value : [];
+                
                 // 4. Upsert into vector store
                 const namespace = `doc_${doc._id}`;
                 if (embeddings.length > 0) {
@@ -94,10 +115,17 @@ const uploadDocument = async (req, res, next) => {
                     vectorStore.upsert(namespace, vectors);
                 }
 
-                // 5. Generate summary
-                const summary = await generateSummary(chunks);
+                // Process summary result
+                const summary = summaryResult.status === 'fulfilled' 
+                    ? summaryResult.value 
+                    : 'Summary unavailable. You can still chat with this document.';
 
-                // 6. Update MongoDB document record
+                // Update progress
+                await writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'processing', {
+                    progress: 'Finalizing...',
+                });
+
+                // 5. Update MongoDB document record
                 await Document.findByIdAndUpdate(doc._id, {
                     status: 'ready',
                     pageCount: numPages,
@@ -106,13 +134,14 @@ const uploadDocument = async (req, res, next) => {
                     vectorNamespace: namespace,
                 });
 
-                // 7. Push final status to Firebase Firestore → client updates card instantly
-                writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'ready', {
+                // 6. Push final status to Firebase Firestore → client updates card instantly
+                await writeStatusToFirestore(req.user._id.toString(), doc._id.toString(), 'ready', {
                     pageCount: numPages,
                     chunkCount: chunks.length,
+                    progress: 'Complete',
                 });
 
-                // 8. Log analytics
+                // 7. Log analytics
                 await Analytics.create({ userId: req.user._id, documentId: doc._id, event: 'upload' });
                 await require('../models/User').findByIdAndUpdate(req.user._id, {
                     $inc: { 'apiUsage.totalUploads': 1 },
