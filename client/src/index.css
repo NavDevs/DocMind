@@ -638,9 +638,28 @@ a:hover {
 
 /* ── Global Mobile Overrides ── */
 @media (max-width: 768px) {
+  /* Fix body scroll */
+  html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Global page container spacing */
   .page-container {
     padding: 0 16px;
+    overflow-x: hidden;
+  }
+
+  /* Fix fixed elements on scroll */
+  .fixed,
+  [class*="fixed"] {
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* Section spacing */

@@ -4,6 +4,7 @@
     padding: 32px 0 80px;
     max-width: 1400px;
     margin: 0 auto;
+    overflow-x: hidden;
 }
 
 /* Sidebar */

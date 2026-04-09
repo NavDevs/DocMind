@@ -1,6 +1,7 @@
 .home-page {
     padding-top: var(--navbar-height);
     position: relative;
+    overflow-x: hidden;
 }
 
 /* Hero */
