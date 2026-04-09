@@ -334,8 +334,8 @@
 @media (max-width: 900px) {
     .hero-section .page-container {
         grid-template-columns: 1fr;
-        gap: 40px;
-        padding: 60px 20px;
+        gap: 32px;
+        padding: 48px 20px;
     }
 
     .hero-visual {
@@ -344,7 +344,7 @@
 
     .features-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 14px;
     }
 
     .hero-actions {
@@ -352,72 +352,133 @@
     }
 
     .hero-stats {
-        gap: 20px;
+        gap: 16px;
     }
 }
 
 @media (max-width: 600px) {
     .features-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .hero-section {
         text-align: center;
-        min-height: 85vh;
+        min-height: auto;
+    }
+
+    .hero-section .page-container {
+        padding: 40px 16px 32px;
+    }
+
+    .hero-title {
+        margin-bottom: 16px;
     }
 
     .hero-subtitle {
         margin-left: auto;
         margin-right: auto;
-        font-size: 1rem;
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+        line-height: 1.5;
     }
 
     .hero-actions {
         flex-direction: column;
         align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
     }
 
     .hero-actions .btn {
         width: 100%;
         justify-content: center;
+        min-height: 48px;
     }
 
     .hero-stats {
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 12px;
         justify-content: center;
+        margin-bottom: 24px;
     }
 
     .stat-divider {
         display: none;
     }
 
+    .stat-item {
+        padding: 12px 16px;
+    }
+
     .cta-card {
-        padding: 48px 24px;
+        padding: 32px 20px;
     }
 
     .section-header {
-        margin-bottom: 48px;
+        margin-bottom: 32px;
     }
 
     .feature-card {
-        padding: 24px;
+        padding: 20px;
     }
 
     .features-section {
-        padding: 60px 0;
+        padding: 40px 0;
     }
 
     .cta-section {
-        padding: 60px 0 80px;
+        padding: 40px 0 60px;
     }
 
     .preview-messages {
         padding: 16px;
+        gap: 12px;
+    }
+
+    .preview-message {
+        padding: 14px 16px;
     }
 
     .hero-badge {
         font-size: 0.75rem;
-        padding: 6px 14px;
+        padding: 6px 12px;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section .page-container {
+        padding: 32px 14px 24px;
+    }
+
+    .hero-title {
+        font-size: 1.75rem;
+        margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .features-section {
+        padding: 32px 0;
+    }
+
+    .cta-section {
+        padding: 32px 0 48px;
+    }
+
+    .cta-card {
+        padding: 28px 16px;
+    }
+
+    .section-header {
+        margin-bottom: 24px;
+    }
+
+    .feature-card {
+        padding: 18px;
     }
 }

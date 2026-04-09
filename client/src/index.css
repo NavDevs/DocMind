@@ -638,8 +638,40 @@ a:hover {
 
 /* ── Global Mobile Overrides ── */
 @media (max-width: 768px) {
+  /* Global page container spacing */
   .page-container {
     padding: 0 16px;
+  }
+
+  /* Section spacing */
+  section {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  /* Heading spacing */
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  /* Paragraph spacing */
+  p {
+    margin-bottom: 12px;
+    line-height: 1.6;
   }
 
   /* Touch-friendly improvements */
@@ -664,5 +696,89 @@ a:hover {
   .btn-icon {
     min-width: 44px;
     min-height: 44px;
+  }
+
+  /* Card spacing */
+  .card,
+  .feature-card,
+  .doc-card,
+  .stat-card {
+    margin-bottom: 12px;
+  }
+
+  /* Grid spacing */
+  .grid,
+  .features-grid,
+  .docs-grid,
+  .stats-grid {
+    gap: 12px;
+  }
+
+  /* Button spacing */
+  .btn {
+    padding: 10px 16px;
+    margin-bottom: 8px;
+  }
+
+  /* List spacing */
+  ul, ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0 14px;
+  }
+
+  section {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+  }
+
+  .card,
+  .feature-card,
+  .doc-card,
+  .stat-card {
+    margin-bottom: 10px;
+    padding: 16px;
+  }
+
+  .grid,
+  .features-grid,
+  .docs-grid,
+  .stats-grid {
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 10px 14px;
+    margin-bottom: 6px;
   }
 }

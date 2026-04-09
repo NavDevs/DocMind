@@ -183,49 +183,125 @@
 @media (max-width: 500px) {
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .analytics-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
-        padding: 24px 0 20px;
+        gap: 10px;
+        padding: 20px 0 16px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
+
+    .analytics-header p {
+        font-size: 0.88rem;
+        line-height: 1.5;
     }
 
     .stat-card {
-        padding: 20px;
+        padding: 18px;
     }
 
     .stat-card-icon {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+        margin-bottom: 12px;
     }
 
     .stat-card-value {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+        margin-bottom: 6px;
     }
 
     .stat-card-label {
-        font-size: 0.78rem;
+        font-size: 0.76rem;
+        line-height: 1.4;
     }
 
     .chart-section {
-        padding: 20px 16px;
-        margin-bottom: 24px;
+        padding: 18px 14px;
+        margin-bottom: 20px;
+    }
+
+    .chart-section h3 {
+        font-size: 0.95rem;
+        margin-bottom: 14px;
     }
 
     .chart-wrapper {
-        height: 200px;
+        height: 180px;
+    }
+
+    .recent-section {
+        padding: 18px 14px;
+    }
+
+    .recent-section h3 {
+        font-size: 0.95rem;
+        margin-bottom: 14px;
     }
 
     .recent-item {
-        padding: 12px 16px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
     }
 
     .recent-name {
-        font-size: 0.82rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
     }
 
     .recent-date {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
+    }
+
+    .recent-icon {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .analytics-header {
+        padding: 16px 0 14px;
+        margin-bottom: 16px;
+    }
+
+    .analytics-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-card-icon {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-card-value {
+        font-size: 1.4rem;
+    }
+
+    .chart-section {
+        padding: 16px 12px;
+        margin-bottom: 16px;
+    }
+
+    .chart-wrapper {
+        height: 160px;
+    }
+
+    .recent-section {
+        padding: 16px 12px;
+    }
+
+    .recent-item {
+        padding: 10px 12px;
     }
 }
