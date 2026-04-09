@@ -34,19 +34,37 @@ const formatContent = (text) => {
         });
 };
 
-const SourcePanel = ({ sources }) => {
+const SourcePanel = ({ sources, onClose }) => {
     if (!sources || sources.length === 0) return null;
+
+    const handleCopy = (text) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Source text copied');
+    };
+
     return (
         <div className="source-panel">
-            <h4>📌 Sources ({sources.length})</h4>
+            <div className="source-header-row">
+                <h4>📌 Sources ({sources.length})</h4>
+                <button className="btn-close-mobile" onClick={onClose}>✕</button>
+            </div>
             <div className="source-list">
                 {sources.map((s, i) => (
                     <div key={i} className="source-item glass-card">
                         <div className="source-meta">
                             <span className="source-num">Source {i + 1}</span>
-                            <span className="source-score">{(s.score * 100).toFixed(0)}% match</span>
+                            <div className="flex gap-2" style={{ alignItems: 'center' }}>
+                                <span className="source-score">{(s.score * 100).toFixed(0)}% match</span>
+                                <button
+                                    className="btn-copy-source"
+                                    onClick={() => handleCopy(s.text)}
+                                    title="Copy source text"
+                                >
+                                    📋
+                                </button>
+                            </div>
                         </div>
-                        <p className="source-text">{s.text.slice(0, 220)}{s.text.length > 220 ? '...' : ''}</p>
+                        <p className="source-text">{s.text}</p>
                     </div>
                 ))}
             </div>
@@ -106,6 +124,13 @@ export default function ChatPage() {
                 timestamp: new Date(),
             };
             setMessages(prev => [...prev, assistantMsg]);
+
+            // Auto-open sources if they are available
+            if (data.sources?.length > 0) {
+                setActiveSources(data.sources);
+                // On mobile we don't necessarily want it to pop up immediately unless user asks
+                // but for "making it work" and not being dummy, we'll ensure they are stored correctly.
+            }
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to get answer');
             setMessages(prev => prev.slice(0, -1)); // remove optimistic user message
@@ -129,25 +154,25 @@ export default function ChatPage() {
     if (docLoading) return <div className="flex-center" style={{ height: '100vh' }}><div className="spinner spinner-lg" /></div>;
 
     return (
-        <div className="chat-page">
+        <div className={`chat-page ${showSources ? 'sources-open' : ''}`}>
             {/* Header */}
             <div className="chat-header">
                 <div className="page-container flex-between">
                     <div className="flex gap-2" style={{ alignItems: 'center' }}>
-                        <Link to="/documents" className="btn btn-secondary btn-sm">← Back</Link>
+                        <Link to="/documents" className="btn btn-secondary btn-sm">← <span className="hide-mobile">Back</span></Link>
                         <div>
                             <div className="chat-doc-name">📄 {doc?.originalName}</div>
-                            <div className="chat-doc-meta">{doc?.pageCount} pages · {doc?.chunkCount} chunks indexed</div>
+                            <div className="chat-doc-meta">{doc?.pageCount} pages · {doc?.chunkCount} chunks</div>
                         </div>
                     </div>
                     <div className="flex gap-2">
                         <button
-                            className={`btn btn-secondary btn-sm ${showSources ? 'active' : ''}`}
+                            className={`btn btn-secondary btn-sm btn-sources-toggle ${showSources ? 'active' : ''}`}
                             onClick={() => setShowSources(!showSources)}
                         >
-                            📌 Sources
+                            📌 <span className="hide-mobile">Sources</span>
                         </button>
-                        <button className="btn btn-danger btn-sm" onClick={handleClearHistory}>🗑 Clear</button>
+                        <button className="btn btn-danger btn-sm" onClick={handleClearHistory}>🗑</button>
                     </div>
                 </div>
             </div>
@@ -175,21 +200,21 @@ export default function ChatPage() {
                                 key={i}
                                 className={`message ${msg.role} animate-fade-up`}
                                 style={{ animationDelay: '0s' }}
-                                onClick={() => {
-                                    if (msg.role === 'assistant' && msg.sources?.length > 0) {
-                                        setActiveSources(msg.sources);
-                                        setShowSources(true);
-                                    }
-                                }}
                             >
                                 <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
                                 <div className="message-body">
                                     <div className="message-content">{msg.role === 'assistant' ? formatContent(msg.content) : msg.content}</div>
-                                    {msg.role === 'assistant' && (
+                                    {msg.role === 'assistant' && msg.sources?.length > 0 && (
                                         <div className="message-footer">
-                                            {msg.sources?.length > 0 && (
-                                                <span className="sources-hint">📌 {msg.sources.length} source{msg.sources.length > 1 ? 's' : ''}</span>
-                                            )}
+                                            <button
+                                                className="btn-msg-sources"
+                                                onClick={() => {
+                                                    setActiveSources(msg.sources);
+                                                    setShowSources(true);
+                                                }}
+                                            >
+                                                📌 {msg.sources.length} sources
+                                            </button>
                                         </div>
                                     )}
                                 </div>
@@ -210,35 +235,42 @@ export default function ChatPage() {
                     </div>
 
                     {/* Input */}
-                    <form onSubmit={handleSubmit} className="chat-input-form">
-                        <input
-                            type="text"
-                            className="form-input chat-input"
-                            placeholder="Ask a question about this document..."
-                            value={question}
-                            onChange={e => setQuestion(e.target.value)}
-                            disabled={loading}
-                            autoFocus
-                        />
-                        <button type="submit" className="btn btn-primary" disabled={loading || !question.trim()}>
-                            {loading ? <span className="spinner" /> : '→'}
-                        </button>
-                    </form>
+                    <div className="chat-input-container">
+                        <form onSubmit={handleSubmit} className="chat-input-form">
+                            <input
+                                type="text"
+                                className="form-input chat-input"
+                                placeholder="Ask about this document..."
+                                value={question}
+                                onChange={e => setQuestion(e.target.value)}
+                                disabled={loading}
+                                autoFocus
+                            />
+                            <button type="submit" className="btn btn-primary btn-send" disabled={loading || !question.trim()}>
+                                {loading ? <span className="spinner" /> : '→'}
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
-                {/* Sources Panel */}
+                {/* Sources Sidebar / Mobile Bottom Sheet */}
                 {showSources && (
-                    <div className="sources-sidebar animate-fade-in">
-                        <div className="sources-header">
-                            <h4>📌 Source Context</h4>
-                            <button className="btn btn-secondary btn-sm btn-icon" onClick={() => setShowSources(false)}>✕</button>
+                    <>
+                        <div className="sources-backdrop" onClick={() => setShowSources(false)} />
+                        <div className="sources-sidebar animate-slide-up">
+                            <div className="sources-header">
+                                <h3>📌 Source Context</h3>
+                                <button className="btn-close" onClick={() => setShowSources(false)}>✕</button>
+                            </div>
+                            <div className="sources-content">
+                                {activeSources.length > 0 ? (
+                                    <SourcePanel sources={activeSources} onClose={() => setShowSources(false)} />
+                                ) : (
+                                    <p className="sources-hint-text">Select a message to view its sources.</p>
+                                )}
+                            </div>
                         </div>
-                        {activeSources.length > 0 ? (
-                            <SourcePanel sources={activeSources} />
-                        ) : (
-                            <p className="sources-hint-text">Click on an AI answer to view its source chunks.</p>
-                        )}
-                    </div>
+                    </>
                 )}
             </div>
         </div>

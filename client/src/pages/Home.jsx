@@ -16,6 +16,15 @@ export default function Home() {
 
     return (
         <div className="home-page">
+            {/* Animated Background */}
+            <div className="blob-container">
+                <div className="blob blob-primary"></div>
+                <div className="blob blob-secondary"></div>
+                <div className="blob blob-tertiary"></div>
+                <div className="blob blob-bottom"></div>
+            </div>
+            <div className="grid-overlay"></div>
+
             {/* Hero */}
             <section className="hero-section">
                 <div className="page-container">
