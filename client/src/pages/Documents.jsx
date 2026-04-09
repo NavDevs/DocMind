@@ -60,8 +60,11 @@ export default function Documents() {
         fetchDocs();
         fetchCollections();
 
-        // 🟢 True Real-time Sync via Firestore
-        if (isConfigured && db && user) {
+        // 🟢 True Real-time Sync via Firestore (only if using Google Auth)
+        // Skip Firestore listener if using email/password auth to avoid permission errors
+        const useFirestoreSync = isConfigured && db && user && user._id && auth?.currentUser;
+        
+        if (useFirestoreSync) {
             const q = query(
                 collection(db, 'docStatus'),
                 where('userId', '==', user._id)
@@ -155,16 +158,34 @@ export default function Documents() {
         const loadingToast = toast.loading('Uploading PDF...');
         
         try {
+            console.log('Starting upload...', { fileName: file.name, fileSize: file.size });
+            
             const { data } = await api.post('/documents/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             
+            console.log('Upload successful:', data);
             toast.dismiss(loadingToast);
             toast.success(`PDF uploaded! Processing will take a few seconds...`);
             setDocs(prev => [data.document, ...prev]);
         } catch (err) {
+            console.error('Upload failed:', err);
+            console.error('Error response:', err.response?.data);
+            console.error('Error status:', err.response?.status);
+            
             toast.dismiss(loadingToast);
-            toast.error(err.response?.data?.message || 'Upload failed. Please try again.');
+            
+            // More specific error messages
+            let errorMessage = 'Upload failed. Please try again.';
+            if (err.response?.status === 401) {
+                errorMessage = 'Please log in to upload documents.';
+            } else if (err.response?.status === 413) {
+                errorMessage = 'File too large. Maximum size is 10MB.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            toast.error(errorMessage);
         } finally {
             setUploading(false);
         }
