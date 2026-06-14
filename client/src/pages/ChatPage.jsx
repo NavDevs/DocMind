@@ -6,33 +6,52 @@ import './ChatPage.css';
 
 const formatContent = (text) => {
     if (!text) return '';
-    // Strip ### markdown headers → bold text, parse **bold** text, and handle line breaks
     return text
         .split('\n')
         .map((line, i) => {
-            const headerMatch = line.match(/^#{1,3}\s+(.*)/);
-            if (headerMatch) {
-                return <div key={i} style={{ fontWeight: 700, marginTop: i > 0 ? '0.75rem' : 0, marginBottom: '0.25rem' }}>{headerMatch[1]}</div>;
-            }
+            // Headings
+            const h1 = line.match(/^#\s+(.*)/);
+            if (h1) return <h2 key={i}>{h1[1]}</h2>;
+            const h2 = line.match(/^##\s+(.*)/);
+            if (h2) return <h3 key={i}>{h2[1]}</h3>;
+            const h3 = line.match(/^###\s+(.*)/);
+            if (h3) return <h4 key={i}>{h3[1]}</h4>;
 
-            // Parse **bold** text inline
-            if (line.includes('**')) {
-                const parts = line.split(/(\*\*.*?\*\*)/g);
-                return (
-                    <div key={i}>
-                        {parts.map((part, j) => {
-                            if (part.startsWith('**') && part.endsWith('**')) {
-                                return <strong key={j}>{part.slice(2, -2)}</strong>;
-                            }
-                            return <span key={j}>{part}</span>;
-                        })}
-                    </div>
-                );
-            }
+            // Bullet lists
+            const bullet = line.match(/^[-*]\s+(.*)/);
+            if (bullet) return <li key={i}>{parseBold(bullet[1])}</li>;
 
-            return <div key={i}>{line || '\u00A0'}</div>;
+            // Numbered lists
+            const numbered = line.match(/^\d+\.\s+(.*)/);
+            if (numbered) return <li key={i}>{parseBold(numbered[1])}</li>;
+
+            // Blockquote
+            const quote = line.match(/^>\s+(.*)/);
+            if (quote) return <blockquote key={i}>{parseBold(quote[1])}</blockquote>;
+
+            // Empty line → spacer
+            if (!line.trim()) return <div key={i} style={{ height: '0.5em' }} />;
+
+            return <p key={i}>{parseBold(line)}</p>;
         });
 };
+
+function parseBold(line) {
+    if (!line.includes('**') && !line.includes('`')) return line;
+    const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+    return parts.map((part, j) => {
+        if (part.startsWith('**') && part.endsWith('**')) return <strong key={j}>{part.slice(2, -2)}</strong>;
+        if (part.startsWith('`') && part.endsWith('`')) return <code key={j}>{part.slice(1, -1)}</code>;
+        return <span key={j}>{part}</span>;
+    });
+}
+
+const SUGGESTED = [
+    'Summarize this document',
+    'What are the key findings?',
+    'List the main conclusions',
+    'What methodology was used?',
+];
 
 const SourcePanel = ({ sources, onClose }) => {
     if (!sources || sources.length === 0) return null;
@@ -245,15 +264,28 @@ export default function ChatPage() {
                     <div className="messages-scroll">
                         {messages.length === 0 && (
                             <div className="chat-empty">
-                                <div style={{ fontSize: '3rem' }}>💬</div>
+                                <div className="chat-empty-icon">💬</div>
                                 <h3>Start chatting</h3>
                                 <p>Ask anything about <strong>{doc?.originalName}</strong></p>
+
                                 {doc?.summary && (
-                                    <div className="doc-summary-box glass-card">
-                                        <strong>📝 Document Summary</strong>
+                                    <div className="doc-summary-box">
+                                        <div className="doc-summary-label">📝 Document Summary</div>
                                         <p>{doc.summary}</p>
                                     </div>
                                 )}
+
+                                <div className="suggested-chips">
+                                    {SUGGESTED.map((q, i) => (
+                                        <button
+                                            key={i}
+                                            className="chip"
+                                            onClick={() => setQuestion(q)}
+                                        >
+                                            {q}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
