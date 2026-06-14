@@ -20,13 +20,13 @@
     right: 0;
     z-index: 100;
     height: var(--navbar-height);
-    background: rgba(5, 5, 6, 0.9);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-sm);
 }
 
 .chat-header .page-container {
@@ -53,12 +53,12 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    border-right: 1px solid var(--border);
     z-index: 101;
     backdrop-filter: blur(20px) saturate(180%);
     animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
 }
 
 @keyframes slideInLeft {
@@ -84,10 +84,7 @@
 .pdf-viewer-header h3 {
     font-size: 0.95rem;
     font-weight: 700;
-    background: linear-gradient(to bottom, #EDEDEF 0%, rgba(237, 237, 239, 0.85) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -230,11 +227,11 @@
 }
 
 .message.assistant .message-content {
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #FFFFFF;
+    border: 1px solid var(--border);
     color: var(--text-primary);
     border-bottom-left-radius: 4px;
-    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-sm);
     position: relative;
 }
 
@@ -245,7 +242,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
     border-radius: 14px 14px 0 0;
 }
 
@@ -308,12 +305,12 @@
 .chat-input-form {
     display: flex;
     gap: 10px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.9);
     padding: 8px;
     padding-left: 20px;
     border-radius: 28px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset, 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    box-shadow: var(--shadow-md);
     pointer-events: all;
     max-width: 800px;
     margin: 0 auto;
@@ -408,10 +405,7 @@
 .sources-header h3 {
     font-size: 1.05rem;
     font-weight: 700;
-    background: linear-gradient(to bottom, #EDEDEF 0%, rgba(237, 237, 239, 0.85) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
     letter-spacing: -0.01em;
 }
 
