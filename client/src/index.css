@@ -1,68 +1,94 @@
 /* ============================================================
    DocMind – Global Design System
-   Warm/Approachable: Soft, organic, and human-centric.
-   Natural lighting meets friendly typography.
+   Material You (MD3): Personal, adaptive, and spirited.
+   Seed: Purple/Violet (#6750A4)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 /* ── Design Tokens ── */
 :root {
-  /* Warm/Organic Light Palette */
-  --bg-deep: #F4EFE6; /* Soft oat/cream */
-  --bg-base: #FCFAF8; /* Warmer off-white */
-  --bg-elevated: #FFFFFF;
-  --bg-card: #FFFFFF;
-  --bg-card-hover: #FFFDFB;
+  /* Material You Palette (Violet Seed) */
+  --bg-base: #FFFBFE;
+  --bg-surface-container: #F3EDF7;
+  --bg-surface-container-low: #E7E0EC;
   
-  /* Surface translucency */
-  --surface: rgba(255, 255, 255, 0.7);
-  --surface-hover: rgba(255, 255, 255, 0.9);
+  --accent: #6750A4; /* Primary */
+  --accent-on-primary: #FFFFFF;
+  --accent-container: #E8DEF8; /* Secondary Container */
+  --accent-on-container: #1D192B;
+  --accent-tertiary: #7D5260;
   
-  /* Borders */
-  --border: rgba(0, 0, 0, 0.06);
-  --border-hover: rgba(0, 0, 0, 0.12);
-  --border-strong: rgba(0, 0, 0, 0.15);
-  --border-accent: rgba(212, 121, 99, 0.3);
-
-  /* Accent & utility colors */
-  /* Warm terracotta/coral instead of neon blue */
-  --accent: #D47963;
-  --accent-bright: #E5866E;
-  --accent-glow: rgba(212, 121, 99, 0.25);
-  --accent-glow-subtle: rgba(212, 121, 99, 0.1);
-
+  --border: #79747E; /* Outline */
+  --border-strong: #79747E;
+  
+  /* Typography Colors */
+  --text-primary: #1C1B1F; /* On Surface */
+  --text-secondary: #49454F; /* On Surface Variant */
+  --text-muted: #79747E; /* Outline color works well for muted text */
+  
   --success: #3E8E41;
   --warning: #D97706;
-  --danger: #DC2626;
-  --info: #4F46E5;
-
-  /* Typography */
-  --text-primary: #3A3530; /* Deep charcoal/brown instead of black */
-  --text-secondary: #6B655F; /* Warm grey */
-  --text-muted: #9C958E;
-  --text-subtle: rgba(58, 53, 48, 0.4);
-
-  --radius-sm: 12px; /* Softer, rounder corners */
+  --danger: #B3261E; /* MD3 Error */
+  
+  /* Adaptive Alpha Surfaces */
+  --surface-alpha-light: rgba(255, 255, 255, 0.8);
+  --surface-alpha-heavy: rgba(255, 255, 255, 0.95);
+  --surface-alpha-overlay: rgba(255, 255, 255, 0.05);
+  
+  /* Radii */
+  --radius-sm: 12px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
-
-  /* Natural, soft drop shadows */
-  --shadow-sm: 0 2px 8px rgba(58, 53, 48, 0.04), 0 1px 2px rgba(58, 53, 48, 0.02);
-  --shadow-md: 0 8px 24px rgba(58, 53, 48, 0.05), 0 3px 6px rgba(58, 53, 48, 0.03);
-  --shadow-lg: 0 16px 40px rgba(58, 53, 48, 0.06), 0 6px 12px rgba(58, 53, 48, 0.04);
-  --shadow-glow: 0 8px 24px rgba(212, 121, 99, 0.25);
-  --shadow-inner: inset 0 2px 4px rgba(58, 53, 48, 0.02);
-
-  /* Fluid easing */
-  --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  --transition-fast: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
-  --transition-slow: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-
-  /* Layout constants */
+  --radius-xxl: 48px;
+  --radius-full: 9999px;
+  
+  /* MD3 Elevation / Shadows */
+  /* Elevation 1 */
+  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 1px rgba(0, 0, 0, 0.05);
+  /* Elevation 2 */
+  --shadow-md: 0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 2px 6px 2px rgba(0, 0, 0, 0.05);
+  /* Elevation 3 */
+  --shadow-lg: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 3px rgba(0, 0, 0, 0.05);
+  /* Elevation 4 */
+  --shadow-xl: 0px 2px 3px 0px rgba(0, 0, 0, 0.1), 0px 6px 10px 4px rgba(0, 0, 0, 0.05);
+  
+  /* MD3 Easing (Emphasized Decelerate) */
+  --transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-fast: all 200ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-slow: all 500ms cubic-bezier(0.2, 0, 0, 1);
+  
   --navbar-height: 72px;
-  --chat-header-height: 60px;
+  --chat-header-height: 64px;
+}
+
+/* ── Dark Mode Tokens ── */
+[data-theme="dark"] {
+  --bg-base: #141218;
+  --bg-surface-container: #211F26;
+  --bg-surface-container-low: #1D1B20;
+  
+  --accent: #D0BCFF;
+  --accent-on-primary: #381E72;
+  --accent-container: #4F378B;
+  --accent-on-container: #EADDFF;
+  --accent-tertiary: #EFB8C8;
+  
+  --border: #49454F;
+  --border-strong: #79747E;
+  
+  --text-primary: #E6E0E9;
+  --text-secondary: #CAC4D0;
+  --text-muted: #938F99;
+  
+  --success: #6DD58C;
+  --warning: #F6C153;
+  --danger: #F2B8B5;
+  
+  --surface-alpha-light: rgba(33, 31, 38, 0.8);
+  --surface-alpha-heavy: rgba(33, 31, 38, 0.95);
+  --surface-alpha-overlay: rgba(255, 255, 255, 0.05);
 }
 
 /* ── Reset & Base ── */
@@ -79,40 +105,26 @@ html {
 }
 
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
-  line-height: 1.65;
+  line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* ── Layered Background System ── */
+/* ── MD3 Organic Blurred Background ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
-  /* Soft, warm ambient light */
-  background: 
-    radial-gradient(ellipse at 50% 0%, #FFFFFF 0%, var(--bg-base) 60%, var(--bg-deep) 100%);
+  background: var(--bg-base);
   pointer-events: none;
 }
 
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  /* Very subtle paper texture */
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* ── Animated Pastel Blobs ── */
 .blob-container {
   position: fixed;
   inset: 0;
@@ -124,8 +136,8 @@ body::after {
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.4; /* Higher opacity since they are light pastels */
+  filter: blur(80px);
+  opacity: 0.15;
   animation: float 14s ease-in-out infinite alternate;
 }
 
@@ -134,7 +146,7 @@ body::after {
   height: 800px;
   top: -100px;
   left: 20%;
-  background: #FAD1B8; /* Peach */
+  background: var(--accent);
   animation-delay: 0s;
 }
 
@@ -143,7 +155,7 @@ body::after {
   height: 700px;
   bottom: -100px;
   right: 10%;
-  background: #D9E4D1; /* Sage */
+  background: var(--accent-tertiary);
   animation-delay: -5s;
   animation-duration: 18s;
 }
@@ -153,13 +165,13 @@ body::after {
   height: 600px;
   top: 40%;
   left: -200px;
-  background: #FCE1E4; /* Soft pink */
+  background: var(--accent-container);
   animation-delay: -9s;
   animation-duration: 20s;
 }
 
 .blob-bottom {
-  display: none; /* Removing the 4th blob for a cleaner look */
+  display: none;
 }
 
 @keyframes float {
@@ -168,9 +180,8 @@ body::after {
   100% { transform: translate(40px, -20px) scale(0.95); }
 }
 
-/* ── No Grid Overlay ── */
 .grid-overlay {
-  display: none; /* Remove harsh grid for a softer feel */
+  display: none;
 }
 
 #root {
@@ -189,41 +200,34 @@ body::after {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: var(--bg-surface-container-low);
   border-radius: 10px;
   border: 2px solid var(--bg-base);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--border);
 }
 
-/* ── Typography ── */
+/* ── Typography (MD3) ── */
 h1 {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 500; /* MD3 headings are usually regular/medium */
+  letter-spacing: -0.01em;
+  line-height: 1.2;
   color: var(--text-primary);
 }
 
 h2 {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-}
-
-h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--text-primary);
 }
 
-h4 {
-  font-size: 1rem;
-  font-weight: 600;
+h3 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -234,76 +238,97 @@ p {
 a {
   color: var(--accent);
   text-decoration: none;
-  font-weight: 500;
   transition: var(--transition-fast);
 }
 
 a:hover {
-  color: var(--accent-bright);
+  opacity: 0.8;
 }
 
-/* ── Glass Cards ── */
+/* ── Layout & Containers ── */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  /* Using MD3 Tonal Surface instead of glass */
+  background: var(--bg-surface-container);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-  opacity: 0;
-  transition: var(--transition);
+  border: none;
 }
 
 .glass-card:hover {
-  border-color: var(--border-hover);
   box-shadow: var(--shadow-md);
-  transform: translateY(-4px);
 }
 
-.glass-card:hover::before {
-  opacity: 1;
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: var(--accent-container);
+  color: var(--accent-on-container);
 }
 
-/* ── Buttons ── */
+/* ── MD3 Buttons (Pill shaped, State Layers) ── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius-full); /* MD3 Pills */
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  border: none;
-  outline: none;
   transition: var(--transition);
-  white-space: nowrap;
+  border: none;
+  gap: 8px;
+  text-decoration: none;
   position: relative;
   overflow: hidden;
+  font-family: inherit;
 }
 
+.btn:active {
+  transform: scale(0.95); /* Tactile feedback */
+}
+
+/* State layer overlay */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: var(--transition-fast);
+  border-radius: inherit;
+}
+
+.btn:hover::before {
+  opacity: 0.08;
+}
+
+.btn:active::before {
+  opacity: 0.12;
+}
+
+/* Filled Primary */
 .btn-primary {
   background: var(--accent);
-  color: #ffffff;
-  box-shadow: var(--shadow-glow);
+  color: var(--accent-on-primary);
+  border: 1px solid transparent;
 }
 
-.btn-primary::before {
+.btn-primary::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -395,7 +420,7 @@ a:hover {
 .form-input {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--surface-alpha-light);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);

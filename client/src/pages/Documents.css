@@ -53,12 +53,12 @@
 }
 
 .collection-item.active {
-    background: rgba(212, 121, 99, 0.1); /* Subtle accent */
-    border-color: var(--border-accent);
-    color: var(--accent);
-    border-left: 3px solid var(--accent);
-    border-radius: 4px var(--radius-sm) var(--radius-sm) 4px;
-    box-shadow: 0 0 0 1px rgba(212, 121, 99, 0.1);
+    background: var(--accent-container);
+    border-color: transparent;
+    color: var(--accent-on-container);
+    border-left: none;
+    border-radius: var(--radius-full);
+    box-shadow: none;
 }
 
 .color-dot {
@@ -139,28 +139,17 @@
 
 /* Upload & Picker */
 .upload-wrapper {
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: var(--radius-xl);
+    background: var(--bg-surface-container);
+    border-radius: var(--radius-xxl);
     padding: 28px;
     margin-bottom: 48px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: none;
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     gap: 16px;
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(16px);
-}
-
-.upload-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
 }
 
 .collection-picker {
@@ -262,6 +251,20 @@
     gap: 24px;
 }
 
+.doc-card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: var(--transition);
+    background: var(--surface-alpha-overlay);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    backdrop-filter: blur(8px);
+}
+
 .doc-card {
     padding: 28px;
     display: flex;
@@ -269,11 +272,11 @@
     gap: 16px;
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--bg-surface-container);
+    border: none;
     border-radius: var(--radius-lg);
     transition: var(--transition);
-    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-sm);
 }
 
 .doc-card::before {
@@ -371,20 +374,9 @@
     padding: 44px;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
+    border: none;
+    background: var(--bg-surface-container);
     position: relative;
-}
-
-.modal-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 1), transparent);
 }
 
 .modal-content h3 {

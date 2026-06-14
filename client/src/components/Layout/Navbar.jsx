@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import './Navbar.css';
 
 export default function Navbar() {
     const { isAuthenticated, user, logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -39,6 +41,9 @@ export default function Navbar() {
                 <div className="navbar-links desktop-links">
                     {isAuthenticated ? (
                         <>
+                            <button className="btn-icon theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+                                {theme === 'dark' ? '☀️' : '🌙'}
+                            </button>
                             <Link to="/documents" className={isActive('/documents')}>Documents</Link>
                             <Link to="/analytics" className={isActive('/analytics')}>Analytics</Link>
                             <div className="navbar-user">
@@ -49,7 +54,10 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className={isActive('/login')}>Sign In</Link>
+                            <button className="btn-icon theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+                                {theme === 'dark' ? '☀️' : '🌙'}
+                            </button>
+                            <Link to="/login" className="btn btn-secondary btn-sm">Sign In</Link>
                             <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
                         </>
                     )}
@@ -94,6 +102,12 @@ export default function Navbar() {
                                     </div>
                                 </div>
                             </div>
+                            <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', margin: '16px 0' }}>
+                                <span>Dark Mode</span>
+                                <button className="btn-icon theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+                                    {theme === 'dark' ? '☀️' : '🌙'}
+                                </button>
+                            </div>
                             <Link to="/documents" className={isActive('/documents')}>📄 Documents</Link>
                             <Link to="/analytics" className={isActive('/analytics')}>📊 Analytics</Link>
 
@@ -105,6 +119,12 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
+                            <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', margin: '16px 0' }}>
+                                <span>Dark Mode</span>
+                                <button className="btn-icon theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+                                    {theme === 'dark' ? '☀️' : '🌙'}
+                                </button>
+                            </div>
                             <Link to="/login" className="btn btn-secondary w-full" style={{ justifyContent: 'center' }}>Sign In</Link>
                             <Link to="/register" className="btn btn-primary w-full" style={{ justifyContent: 'center' }}>Get Started →</Link>
                         </>

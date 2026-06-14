@@ -24,13 +24,12 @@
 .stat-card {
     padding: 28px;
     text-align: center;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--bg-surface-container);
+    border: none;
     border-radius: var(--radius-lg);
     transition: var(--transition);
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(16px);
 }
 
 .stat-card::before {
@@ -40,13 +39,12 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    background: linear-gradient(90deg, transparent, var(--surface-alpha-light), transparent);
     opacity: 0;
     transition: var(--transition);
 }
 
 .stat-card:hover {
-    border-color: var(--border-hover);
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
 }
@@ -87,11 +85,10 @@
 .chart-section {
     padding: 32px;
     margin-bottom: 32px;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--bg-surface-container);
+    border: none;
     border-radius: var(--radius-lg);
     transition: var(--transition);
-    backdrop-filter: blur(16px);
 }
 
 .chart-section h3 {
@@ -120,15 +117,14 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--bg-surface-container);
+    border: none;
     border-radius: var(--radius-md);
     transition: var(--transition);
 }
 
 .recent-item:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-hover);
+    background: var(--bg-surface-container-low);
     transform: translateX(4px);
     box-shadow: var(--shadow-sm);
 }
