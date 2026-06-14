@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,11 +21,13 @@ const isConfigured = !!(
 
 let app = null;
 let auth = null;
+let db = null;
 let googleProvider = null;
 
 if (isConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
+    db = getFirestore(app);
 
     googleProvider = new GoogleAuthProvider();
     // Add required scopes (no forced account-picker — returning users login instantly)
@@ -34,4 +37,4 @@ if (isConfigured) {
     console.warn('⚠️ Firebase not configured — Google Sign-in disabled. Set VITE_FIREBASE_* in client/.env');
 }
 
-export { auth, googleProvider, signInWithPopup, signOut, isConfigured };
+export { auth, db, googleProvider, signInWithPopup, signOut, isConfigured };
