@@ -39,12 +39,8 @@ function initializeFirebaseAdmin() {
  * Sync user profile to Firestore users collection
  */
 async function syncUserToFirestore(user) {
-    if (!adminFirestore || !user) {
-        console.warn('⚠️ Firestore Sync Skipped: adminFirestore or user missing');
-        return;
-    }
+    if (!adminFirestore || !user) return;
     try {
-        console.log(`📡 Syncing user ${user.email} to Firestore...`);
         await adminFirestore.collection('users').doc(user._id.toString()).set({
             name: user.name,
             email: user.email,
@@ -52,7 +48,6 @@ async function syncUserToFirestore(user) {
             lastActive: admin.firestore.FieldValue.serverTimestamp(),
             mongoId: user._id.toString()
         }, { merge: true });
-        console.log(`✅ User ${user.email} synced successfully`);
     } catch (err) {
         console.error('❌ Firestore User Sync Error:', err.message);
     }

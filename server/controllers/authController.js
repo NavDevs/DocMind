@@ -18,9 +18,9 @@ const register = async (req, res, next) => {
 
         const token = signToken(user._id);
 
-        // Sync to Firestore & Log
-        await syncUserToFirestore(user);
-        await logActivityToFirestore(user._id, 'register');
+        // Fire-and-forget — Firestore sync runs in background, does not block response
+        syncUserToFirestore(user).catch(() => {});
+        logActivityToFirestore(user._id, 'register').catch(() => {});
 
         res.status(201).json({ success: true, token, user });
     } catch (err) {
@@ -43,9 +43,9 @@ const login = async (req, res, next) => {
 
         const token = signToken(user._id);
 
-        // Sync to Firestore & Log
-        await syncUserToFirestore(user);
-        await logActivityToFirestore(user._id, 'login');
+        // Fire-and-forget — Firestore sync runs in background, does not block response
+        syncUserToFirestore(user).catch(() => {});
+        logActivityToFirestore(user._id, 'login').catch(() => {});
 
         res.json({ success: true, token, user });
     } catch (err) {
@@ -65,8 +65,8 @@ const firebaseAuth = async (req, res) => {
     try {
         const token = signToken(req.user._id);
 
-        // Profiles are synced in middleware, but we log the login here
-        await logActivityToFirestore(req.user._id, 'login_google');
+        // Fire-and-forget — log Google login in background
+        logActivityToFirestore(req.user._id, 'login_google').catch(() => {});
 
         res.json({ success: true, token, user: req.user });
     } catch (err) {
