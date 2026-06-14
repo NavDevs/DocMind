@@ -100,6 +100,26 @@ export default function Documents() {
         }
     }, [fetchDocs, fetchCollections, user]);
 
+    // 🔄 Polling fallback — refreshes processing docs every 3s (for email/password users without Firestore)
+    useEffect(() => {
+        const hasProcessing = docs.some(d => d.status === 'processing');
+        if (!hasProcessing) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const { data } = await api.get('/documents');
+                setDocs(data.documents);
+                // Stop polling once all docs are done
+                const stillProcessing = data.documents.some(d => d.status === 'processing');
+                if (!stillProcessing) clearInterval(interval);
+            } catch {
+                // silently ignore polling errors
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [docs]);
+
     const handleCreateCollection = async (e) => {
         e.preventDefault();
         if (!newCollName.trim()) return;
