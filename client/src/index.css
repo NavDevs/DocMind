@@ -438,9 +438,19 @@ a:hover {
 
 .form-input:focus {
   outline: none;
-  background: #ffffff;
+  background: var(--bg-base);
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-glow-subtle);
+  box-shadow: 0 0 0 4px var(--accent-glow-subtle, rgba(103, 80, 164, 0.15));
+}
+
+/* Fix browser autofill background color */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover, 
+.form-input:-webkit-autofill:focus, 
+.form-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-surface-container) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .form-error {
