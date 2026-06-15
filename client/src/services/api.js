@@ -18,8 +18,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (res) => res,
     (err) => {
-        if (err.response?.status === 401) {
+        const url = err.config?.url || '';
+        // Only trigger global logout for non-auth endpoints
+        if (err.response?.status === 401 && !url.includes('/auth/')) {
             localStorage.removeItem('docmind_token');
+            localStorage.removeItem('docmind_user');
             window.location.href = '/login';
         }
         return Promise.reject(err);
