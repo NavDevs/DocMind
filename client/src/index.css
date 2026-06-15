@@ -239,6 +239,7 @@ a {
   color: var(--accent);
   text-decoration: none;
   transition: var(--transition-fast);
+  touch-action: manipulation;
 }
 
 a:hover {
@@ -296,6 +297,7 @@ a:hover {
   position: relative;
   overflow: hidden;
   font-family: inherit;
+  touch-action: manipulation;
 }
 
 .btn:active {

@@ -748,7 +748,7 @@
     }
 
     .messages-scroll {
-        padding: 16px 14px 110px;
+        padding: 16px 14px calc(110px + env(safe-area-inset-bottom));
         gap: 16px;
         overflow-y: auto;
         overflow-x: hidden;
@@ -762,7 +762,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 10px 12px 18px;
+        padding: 10px 12px calc(18px + env(safe-area-inset-bottom));
         z-index: 99;
     }
 
@@ -804,7 +804,11 @@
         backdrop-filter: blur(6px);
     }
 
-    .sources-content { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .sources-content { 
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch; 
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
 
     .btn-close-mobile {
         display: flex;
