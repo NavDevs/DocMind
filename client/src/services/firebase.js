@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -37,4 +37,4 @@ if (isConfigured) {
     console.warn('⚠️ Firebase not configured — Google Sign-in disabled. Set VITE_FIREBASE_* in client/.env');
 }
 
-export { auth, db, googleProvider, signInWithPopup, signOut, isConfigured };
+export { auth, db, googleProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, isConfigured };

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
-import { auth, googleProvider, signInWithPopup, signOut, isConfigured } from '../services/firebase';
+import { auth, googleProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, isConfigured } from '../services/firebase';
 
 const AuthContext = createContext(null);
 
@@ -17,20 +17,47 @@ export const AuthProvider = ({ children }) => {
 
     // Restore / validate session on mount — runs in background, does NOT block UI
     useEffect(() => {
-        if (!token) { setLoading(false); return; }
+        const initializeAuth = async () => {
+            // 1. Check if we just returned from a Google Redirect
+            if (isConfigured && auth) {
+                try {
+                    const result = await getRedirectResult(auth);
+                    if (result) {
+                        const firebaseToken = await result.user.getIdToken();
+                        const { data } = await api.post('/auth/firebase', null, {
+                            headers: { Authorization: `Bearer ${firebaseToken}` },
+                        });
+                        localStorage.setItem('docmind_token', data.token);
+                        localStorage.setItem('docmind_user', JSON.stringify(data.user));
+                        setToken(data.token);
+                        setUser(data.user);
+                        setLoading(false);
+                        window.location.href = '/documents';
+                        return; // Stop here, redirect takes over
+                    }
+                } catch (err) {
+                    console.error('Firebase redirect error:', err);
+                }
+            }
 
-        api.get('/auth/me')
-            .then(({ data }) => {
-                setUser(data.user);
-                localStorage.setItem('docmind_user', JSON.stringify(data.user));
-            })
-            .catch(() => {
-                localStorage.removeItem('docmind_token');
-                localStorage.removeItem('docmind_user');
-                setToken(null);
-                setUser(null);
-            })
-            .finally(() => setLoading(false));
+            // 2. Standard Session Restore
+            if (!token) { setLoading(false); return; }
+
+            api.get('/auth/me')
+                .then(({ data }) => {
+                    setUser(data.user);
+                    localStorage.setItem('docmind_user', JSON.stringify(data.user));
+                })
+                .catch(() => {
+                    localStorage.removeItem('docmind_token');
+                    localStorage.removeItem('docmind_user');
+                    setToken(null);
+                    setUser(null);
+                })
+                .finally(() => setLoading(false));
+        };
+
+        initializeAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // run once on mount only
 
@@ -46,24 +73,41 @@ export const AuthProvider = ({ children }) => {
     const loginWithGoogle = async () => {
         if (!isConfigured) throw new Error('Firebase is not configured. Add VITE_FIREBASE_* to client/.env');
 
-        // 1. Open Google popup
-        const result = await signInWithPopup(auth, googleProvider);
+        try {
+            // 1. Try Google popup
+            const result = await signInWithPopup(auth, googleProvider);
 
-        // 2. Get Firebase ID token (uses cached token if still valid — very fast)
-        const firebaseToken = await result.user.getIdToken();
+            // 2. Get Firebase ID token
+            const firebaseToken = await result.user.getIdToken();
 
-        // 3. Exchange for our app JWT
-        const { data } = await api.post('/auth/firebase', null, {
-            headers: { Authorization: `Bearer ${firebaseToken}` },
-        });
+            // 3. Exchange for our app JWT
+            const { data } = await api.post('/auth/firebase', null, {
+                headers: { Authorization: `Bearer ${firebaseToken}` },
+            });
 
-        // 4. Persist session
-        localStorage.setItem('docmind_token', data.token);
-        localStorage.setItem('docmind_user', JSON.stringify(data.user));
-        setToken(data.token);
-        setUser(data.user);
+            // 4. Persist session
+            localStorage.setItem('docmind_token', data.token);
+            localStorage.setItem('docmind_user', JSON.stringify(data.user));
+            setToken(data.token);
+            setUser(data.user);
 
-        return data.user;
+            return data.user;
+        } catch (error) {
+            console.error('Google Popup failed:', error.code || error.message);
+            // If popup is blocked by COOP headers or stuck in a bad nonce state, seamlessly fallback to redirect
+            if (
+                error.code === 'auth/missing-or-invalid-nonce' ||
+                error.message.includes('Duplicate credential') ||
+                error.code === 'auth/popup-closed-by-user' ||
+                error.code === 'auth/cross-origin-opener-policy-failed'
+            ) {
+                console.warn('Falling back to Google Redirect...');
+                await signInWithRedirect(auth, googleProvider);
+                // execution stops here as the browser navigates away
+                return new Promise(() => {}); // never resolves, preventing UI flash
+            }
+            throw error; // throw other errors to be caught by the UI
+        }
     };
 
     const logout = async () => {
