@@ -54,6 +54,11 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/collections', collectionRoutes);
 
+// Root path (For Uptime Monitors/Cron jobs)
+app.get('/', (req, res) => {
+  res.status(200).send('Server is awake!');
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'DocMind API' });
