@@ -72,8 +72,8 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
 
 CRITICAL RULES:
 1. If "Document Context" is provided and the user asks a document-related question, you MUST primarily use that context to answer, quoting exact text when possible.
-2. If the user's input is a casual greeting (like "hi") or normal conversation, respond naturally and warmly like a friend. Do NOT mention the document context or state that your answer is unrelated to it.
-3. If the user asks a specific question that is NOT in the document context, answer using your general knowledge, but politely mention it's not in the document.
+2. If the user's input is a casual greeting (like "hi") or normal conversation, respond naturally and warmly like a friend. Do NOT output any notes, warnings, disclaimers, or meta-commentary about your behavior (e.g., never say "Note: Since your question is a casual greeting...").
+3. If the user asks a specific question that is NOT in the document context, answer using your general knowledge. You may politely mention it's not in the document only if necessary, but keep it brief.
 4. Structure complex answers with clear formatting (bullet points, bold text) for readability. Do NOT use markdown headers like ###.`;
 
     // 6. Build messages array with chat history

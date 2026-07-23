@@ -91,6 +91,43 @@ const SourcePanel = ({ sources, onClose }) => {
     );
 };
 
+const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
+    const [displayedText, setDisplayedText] = useState(isLastAi ? "" : msg.content);
+
+    useEffect(() => {
+        if (!isLastAi) {
+            setDisplayedText(msg.content);
+            return;
+        }
+
+        let currentIndex = displayedText.length;
+        if (currentIndex >= msg.content.length) {
+            setDisplayedText(msg.content);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            currentIndex += 5;
+            if (currentIndex >= msg.content.length) {
+                currentIndex = msg.content.length;
+                clearInterval(interval);
+            }
+            setDisplayedText(msg.content.slice(0, currentIndex));
+            onUpdate();
+        }, 15);
+
+        return () => clearInterval(interval);
+    }, [msg.content, isLastAi]); // We omit onUpdate from dependency array intentionally
+
+    const dynamicPadding = Math.min(Math.max(16 + (msg.content.length * 0.05), 16), 64);
+
+    return (
+        <div className="message-content" style={{ padding: `${dynamicPadding}px`, transition: 'padding 0.3s ease' }}>
+            {formatContent(displayedText)}
+        </div>
+    );
+};
+
 export default function ChatPage() {
     const { documentId } = useParams();
     const [doc, setDoc] = useState(null);
@@ -126,8 +163,12 @@ export default function ChatPage() {
         loadDoc();
     }, [documentId]);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    };
+
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        scrollToBottom();
     }, [messages]);
 
     const handleSubmit = async (e) => {
@@ -289,31 +330,44 @@ export default function ChatPage() {
                             </div>
                         )}
 
-                        {messages.map((msg, i) => (
-                            <div
-                                key={i}
-                                className={`message ${msg.role} animate-fade-up`}
-                                style={{ animationDelay: '0s' }}
-                            >
-                                <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
-                                <div className="message-body">
-                                    <div className="message-content">{msg.role === 'assistant' ? formatContent(msg.content) : msg.content}</div>
-                                    {msg.role === 'assistant' && msg.sources?.length > 0 && (
-                                        <div className="message-footer">
-                                            <button
-                                                className="btn-msg-sources"
-                                                onClick={() => {
-                                                    setActiveSources(msg.sources);
-                                                    setShowSources(true);
-                                                }}
-                                            >
-                                                📌 {msg.sources.length} sources
-                                            </button>
-                                        </div>
-                                    )}
+                        {messages.map((msg, i) => {
+                            const isLastAi = i === messages.length - 1 && msg.role === 'assistant';
+                            return (
+                                <div
+                                    key={i}
+                                    className={`message ${msg.role} animate-fade-up`}
+                                    style={{ animationDelay: '0s' }}
+                                >
+                                    <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
+                                    <div className="message-body">
+                                        {msg.role === 'assistant' ? (
+                                            <TypewriterMessage 
+                                                msg={msg} 
+                                                isLastAi={isLastAi} 
+                                                onUpdate={scrollToBottom} 
+                                            />
+                                        ) : (
+                                            <div className="message-content">
+                                                {msg.content}
+                                            </div>
+                                        )}
+                                        {msg.role === 'assistant' && msg.sources?.length > 0 && (
+                                            <div className="message-footer">
+                                                <button
+                                                    className="btn-msg-sources"
+                                                    onClick={() => {
+                                                        setActiveSources(msg.sources);
+                                                        setShowSources(true);
+                                                    }}
+                                                >
+                                                    📌 {msg.sources.length} sources
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
 
                         {loading && (
                             <div className="message assistant animate-fade-up">
