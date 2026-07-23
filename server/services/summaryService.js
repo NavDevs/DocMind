@@ -1,4 +1,4 @@
-const { getChatClient, getChatModel } = require('../config/openai');
+const { getChatClient, getChatModel, callChatCompletionWithFallback } = require('../config/openai');
 
 /**
  * Generates a concise document summary using Groq (or OpenAI fallback).
@@ -10,7 +10,7 @@ async function generateSummary(chunks) {
     const context = chunks.slice(0, 6).map(c => c.text).join('\n\n');
 
     try {
-        const completion = await client.chat.completions.create({
+        const completion = await callChatCompletionWithFallback(client, {
             model: getChatModel(),
             messages: [
                 {

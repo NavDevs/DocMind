@@ -1,4 +1,4 @@
-const { getChatClient, getChatModel } = require('../config/openai');
+const { getChatClient, getChatModel, callChatCompletionWithFallback } = require('../config/openai');
 const vectorStore = require('./vectorService');
 const { embedQuery } = require('./embeddingService');
 const Analytics = require('../models/Analytics');
@@ -99,10 +99,10 @@ CRITICAL RULES:
 
     messages.push({ role: 'user', content: userMessage });
 
-    // 7. Call Groq (or OpenAI fallback)
-    console.log('[RAG] Calling chat completions API with model:', model);
-    const completion = await client.chat.completions.create({
-        model,
+    // 7. Call Groq (or OpenAI fallback) with bulletproof retry logic
+    console.log('[RAG] Calling chat completions API with fallback logic...');
+    const completion = await callChatCompletionWithFallback(client, {
+        model, // initial model attempt
         messages,
         temperature: 0.2, // Lower temperature for more factual, deterministic answers
         max_tokens: 3000, // Increased to allow full table extraction
