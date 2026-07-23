@@ -39,15 +39,15 @@ function getChatClient() {
  * Returns the model name to use based on which client is active.
  */
 function getChatModel() {
-    if (getGroq()) return process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+    if (getGroq()) return process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
     return 'gpt-4o-mini';
 }
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const GROQ_MODELS = [
-    "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
     "mixtral-8x7b-32768"
 ];
 

@@ -107,14 +107,14 @@ const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
         }
 
         const interval = setInterval(() => {
-            currentIndex += 5;
+            currentIndex += 12;
             if (currentIndex >= msg.content.length) {
                 currentIndex = msg.content.length;
                 clearInterval(interval);
             }
             setDisplayedText(msg.content.slice(0, currentIndex));
             onUpdate();
-        }, 15);
+        }, 10);
 
         return () => clearInterval(interval);
     }, [msg.content, isLastAi]); // We omit onUpdate from dependency array intentionally
