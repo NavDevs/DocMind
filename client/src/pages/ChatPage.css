@@ -127,16 +127,16 @@
     min-width: 0;
     position: relative;
     background: var(--bg-base);
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .messages-scroll {
     flex: 1;
-    overflow-y: auto;
     padding: 32px 24px 120px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    scroll-behavior: smooth;
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
