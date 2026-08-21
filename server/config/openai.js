@@ -39,32 +39,44 @@ function getChatClient() {
  * Returns the model name to use based on which client is active.
  */
 function getChatModel() {
-    if (getGroq()) return process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+    if (getGroq()) return process.env.GROQ_MODEL || 'groq/compound-mini';
     return 'gpt-4o-mini';
 }
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const GROQ_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768"
+    "groq/compound-mini",
+    "groq/compound",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
+    "allam-2-7b"
 ];
 
 /**
  * Bulletproof wrapper for chat completions.
  * Handles rate limits (429) and server errors (5xx) with exponential backoff.
  * Instantly falls back on bad requests (400) or not found (404) (e.g., deprecated models).
+ * If all static models fail, dynamically discovers available models from the provider.
  */
 async function callChatCompletionWithFallback(client, options) {
     const isGroq = client.baseURL && client.baseURL.includes('groq.com');
-    // If not Groq, just try the provided model (OpenAI)
-    const models = isGroq ? GROQ_MODELS : [options.model || 'gpt-4o-mini'];
+    let models = isGroq ? [...GROQ_MODELS] : [options.model || 'gpt-4o-mini'];
+
+    // If options.model is specified and not already at the front, ensure it's tried first
+    if (options.model && !models.includes(options.model)) {
+        models.unshift(options.model);
+    } else if (options.model && models.includes(options.model) && models[0] !== options.model) {
+        models = [options.model, ...models.filter(m => m !== options.model)];
+    }
+
+    let lastError = null;
 
     for (let i = 0; i < models.length; i++) {
         const model = models[i];
         let retries = 0;
-        const maxRetries = 3;
+        const maxRetries = 2;
 
         while (retries <= maxRetries) {
             try {
@@ -73,18 +85,18 @@ async function callChatCompletionWithFallback(client, options) {
                     model: model
                 });
             } catch (error) {
+                lastError = error;
                 const status = error.status || (error.response && error.response.status);
 
                 if (status === 400 || status === 404) {
-                    console.warn(`[API] Model ${model} returned ${status}. Decommissioned/Invalid. Falling back to next model immediately.`);
-                    break; // Break the while loop to move to the next model in the for loop
+                    console.warn(`[API] Model ${model} returned ${status} (decommissioned/unavailable). Falling back immediately.`);
+                    break; // Break the while loop to move to the next model
                 }
 
                 if (status === 429 || (status >= 500 && status < 600)) {
                     if (retries < maxRetries) {
                         retries++;
-                        // Exponential backoff: 2s, 4s, 8s + jitter
-                        const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+                        const delay = Math.pow(2, retries) * 1000 + Math.random() * 500;
                         console.warn(`[API] Model ${model} returned ${status}. Retrying (${retries}/${maxRetries}) in ${Math.round(delay)}ms...`);
                         await sleep(delay);
                         continue;
@@ -104,7 +116,33 @@ async function callChatCompletionWithFallback(client, options) {
         }
     }
 
-    throw new Error('All AI models in the fallback array have been exhausted or failed.');
+    // Dynamic auto-discovery fallback if all predefined models fail:
+    if (isGroq) {
+        try {
+            console.log('[API] Attempting dynamic model discovery from Groq...');
+            const list = await client.models.list();
+            const excludePatterns = ['whisper', 'prompt-guard', 'orpheus', 'safeguard'];
+            const discovered = list.data
+                .map(m => m.id)
+                .filter(id => !excludePatterns.some(p => id.toLowerCase().includes(p)) && !models.includes(id));
+
+            for (const dModel of discovered) {
+                try {
+                    console.log(`[API] Trying dynamically discovered model: ${dModel}`);
+                    return await client.chat.completions.create({
+                        ...options,
+                        model: dModel
+                    });
+                } catch (e) {
+                    console.warn(`[API] Discovered model ${dModel} failed:`, e.message);
+                }
+            }
+        } catch (discErr) {
+            console.error('[API] Dynamic model discovery failed:', discErr.message);
+        }
+    }
+
+    throw lastError || new Error('All AI models in the fallback array have been exhausted or failed.');
 }
 
 module.exports = { getGroq, getOpenAI, getChatClient, getChatModel, callChatCompletionWithFallback };
