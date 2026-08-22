@@ -449,18 +449,19 @@
 }
 
 /* ── Typewriter ── */
-.message-content.typewriter-active {
-    will-change: contents;
+.message.assistant .message-content p.typewriter-line {
+    margin: 0;
+    padding: 0;
 }
 
-.typewriter-cursor {
+.message-content.typewriter-active p.typewriter-line::after {
+    content: '';
     display: inline-block;
     width: 2px;
-    height: 1.05em;
+    height: 0.85em;
     margin-left: 2px;
-    vertical-align: text-bottom;
+    vertical-align: -0.05em;
     background: var(--accent);
-    border-radius: 1px;
     animation: cursorPulse 1.1s ease-in-out infinite;
 }
 

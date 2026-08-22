@@ -91,20 +91,27 @@ const SourcePanel = ({ sources, onClose }) => {
     );
 };
 
-const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
-    const [displayedText, setDisplayedText] = useState(isLastAi ? '' : msg.content);
-    const [isTyping, setIsTyping] = useState(isLastAi);
+const getTypingSpeed = (length) => {
+    const minDuration = 1.2;
+    const maxDuration = 7;
+    const duration = Math.min(maxDuration, Math.max(minDuration, length / 90));
+    return length / duration;
+};
+
+const StaticAssistantMessage = ({ content }) => (
+    <div className="message-content">
+        {formatContent(content)}
+    </div>
+);
+
+const AnimatedTypewriterMessage = ({ msg, onUpdate }) => {
+    const [displayedText, setDisplayedText] = useState('');
+    const [isTyping, setIsTyping] = useState(true);
     const rafRef = useRef(null);
     const charIndexRef = useRef(0);
     const lastScrollRef = useRef(0);
 
     useEffect(() => {
-        if (!isLastAi) {
-            setDisplayedText(msg.content);
-            setIsTyping(false);
-            return;
-        }
-
         const content = msg.content;
         charIndexRef.current = 0;
         setDisplayedText('');
@@ -112,14 +119,14 @@ const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
 
         let lastTime = null;
         let carry = 0;
-        const CHARS_PER_SEC = 52;
+        const charsPerSec = getTypingSpeed(content.length);
 
         const animate = (timestamp) => {
             if (!lastTime) lastTime = timestamp;
             const dt = (timestamp - lastTime) / 1000;
             lastTime = timestamp;
 
-            carry += CHARS_PER_SEC * dt;
+            carry += charsPerSec * dt;
             if (carry >= 1) {
                 const step = Math.floor(carry);
                 carry -= step;
@@ -144,14 +151,24 @@ const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
         return () => {
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
         };
-    }, [msg.content, isLastAi]);
+    }, [msg.content]);
+
+    if (!isTyping) {
+        return <StaticAssistantMessage content={msg.content} />;
+    }
 
     return (
-        <div className={`message-content${isTyping ? ' typewriter-active' : ''}`}>
-            {formatContent(displayedText)}
-            {isTyping && <span className="typewriter-cursor" aria-hidden="true" />}
+        <div className="message-content typewriter-active">
+            <p className="typewriter-line">{displayedText.replace(/\n+$/, '')}</p>
         </div>
     );
+};
+
+const TypewriterMessage = ({ msg, shouldAnimate, onUpdate }) => {
+    if (!shouldAnimate) {
+        return <StaticAssistantMessage content={msg.content} />;
+    }
+    return <AnimatedTypewriterMessage msg={msg} onUpdate={onUpdate} />;
 };
 
 export default function ChatPage() {
@@ -164,9 +181,14 @@ export default function ChatPage() {
     const [activeSources, setActiveSources] = useState([]);
     const [showSources, setShowSources] = useState(false);
     const [showPdf, setShowPdf] = useState(false);
+    const [typingMessageKey, setTypingMessageKey] = useState(null);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
+        setMessages([]);
+        setTypingMessageKey(null);
+        setDocLoading(true);
+
         const loadDoc = async () => {
             try {
                 const [docRes, histRes] = await Promise.all([
@@ -208,13 +230,16 @@ export default function ChatPage() {
 
         try {
             const { data } = await api.post(`/chat/${documentId}`, { question: question.trim() });
+            const typingKey = `typing-${Date.now()}`;
             const assistantMsg = {
                 role: 'assistant',
                 content: data.answer,
                 sources: data.sources,
                 confidenceScore: data.confidenceScore,
                 timestamp: new Date(),
+                typingKey,
             };
+            setTypingMessageKey(typingKey);
             setMessages(prev => [...prev, assistantMsg]);
 
             // Auto-open sources if they are available
@@ -236,6 +261,7 @@ export default function ChatPage() {
         try {
             await api.delete(`/chat/${documentId}/history`);
             setMessages([]);
+            setTypingMessageKey(null);
             setActiveSources([]);
             toast.success('Chat history cleared');
         } catch {
@@ -356,20 +382,17 @@ export default function ChatPage() {
                             </div>
                         )}
 
-                        {messages.map((msg, i) => {
-                            const isLastAi = i === messages.length - 1 && msg.role === 'assistant';
-                            return (
+                        {messages.map((msg, i) => (
                                 <div
-                                    key={i}
-                                    className={`message ${msg.role} animate-fade-up`}
-                                    style={{ animationDelay: '0s' }}
+                                    key={msg.typingKey || msg.timestamp || i}
+                                    className={`message ${msg.role}${msg.typingKey === typingMessageKey ? '' : ' animate-fade-up'}`}
                                 >
                                     <div className="message-avatar">{msg.role === 'user' ? '👤' : '🧠'}</div>
                                     <div className="message-body">
                                         {msg.role === 'assistant' ? (
                                             <TypewriterMessage 
                                                 msg={msg} 
-                                                isLastAi={isLastAi} 
+                                                shouldAnimate={msg.typingKey === typingMessageKey} 
                                                 onUpdate={scrollToBottom} 
                                             />
                                         ) : (
@@ -392,8 +415,7 @@ export default function ChatPage() {
                                         )}
                                     </div>
                                 </div>
-                            );
-                        })}
+                        ))}
 
                         {loading && (
                             <div className="message assistant animate-fade-up">
