@@ -5,8 +5,9 @@ const Analytics = require('../models/Analytics');
 const User = require('../models/User');
 const Document = require('../models/Document');
 
-const TOP_K = 8;
-const SIMILARITY_THRESHOLD = 0.10; // Lowered threshold because local TF-IDF scores are naturally lower than OpenAI
+const TOP_K = 4;
+const SIMILARITY_THRESHOLD = 0.10;
+const MAX_CHUNK_CHARS = 800;
 
 /**
  * Main RAG pipeline: embed question → retrieve chunks → build prompt → LLM answer
@@ -44,26 +45,21 @@ async function answerQuestion(documentId, userId, question, chatHistory = []) {
     const hasStrongMatches = matches.length > 0 && matches[0].score > 0.50;
     const hasAnyMatches = matches.length > 0;
 
-    // 4. Build document context
+    // 4. Build document context (truncate each chunk to fit Groq free-tier limits)
     let context = '';
-    let mode = 'general'; // 'document' or 'general'
+    let mode = 'general';
 
-    if (hasStrongMatches) {
+    const truncate = (text) => text.length > MAX_CHUNK_CHARS ? text.slice(0, MAX_CHUNK_CHARS) + '...' : text;
+
+    if (hasStrongMatches || hasAnyMatches) {
         mode = 'document';
         context = matches
-            .map((m, i) => `[Source ${i + 1} | Chunk #${m.metadata.chunkIndex}]:\n${m.metadata.text}`)
-            .join('\n\n---\n\n');
-    } else if (hasAnyMatches) {
-        // Weak matches — include them as supplementary context
-        mode = 'document';
-        context = matches
-            .map((m, i) => `[Source ${i + 1} | Chunk #${m.metadata.chunkIndex}]:\n${m.metadata.text}`)
-            .join('\n\n---\n\n');
+            .map((m, i) => `[Source ${i + 1}]: ${truncate(m.metadata.text)}`)
+            .join('\n\n');
     } else {
-        // No vector matches — try document summary
         const doc = await Document.findById(documentId).select('summary originalName');
         if (doc?.summary) {
-            context = `Document: "${doc.originalName}"\nSummary: ${doc.summary}`;
+            context = `Document: "${doc.originalName}"\nSummary: ${truncate(doc.summary)}`;
         }
     }
 
@@ -81,9 +77,9 @@ CRITICAL RULES:
         { role: 'system', content: systemPrompt },
     ];
 
-    // Include last 6 messages of chat history for conversational context
+    // Include last 3 messages of chat history for conversational context
     if (chatHistory.length > 0) {
-        const recentHistory = chatHistory.slice(-6);
+        const recentHistory = chatHistory.slice(-3);
         for (const msg of recentHistory) {
             messages.push({
                 role: msg.role,
@@ -104,8 +100,8 @@ CRITICAL RULES:
     const completion = await callChatCompletionWithFallback(client, {
         model, // initial model attempt
         messages,
-        temperature: 0.2, // Lower temperature for more factual, deterministic answers
-        max_tokens: 3000, // Increased to allow full table extraction
+        temperature: 0.2,
+        max_tokens: 1024,
     });
 
     const answer = completion.choices[0].message.content;

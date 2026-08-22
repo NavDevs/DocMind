@@ -88,9 +88,9 @@ async function callChatCompletionWithFallback(client, options) {
                 lastError = error;
                 const status = error.status || (error.response && error.response.status);
 
-                if (status === 400 || status === 404) {
-                    console.warn(`[API] Model ${model} returned ${status} (decommissioned/unavailable). Falling back immediately.`);
-                    break; // Break the while loop to move to the next model
+                if (status === 400 || status === 404 || status === 413) {
+                    console.warn(`[API] Model ${model} returned ${status} (unavailable/too large). Falling back immediately.`);
+                    break;
                 }
 
                 if (status === 429 || (status >= 500 && status < 600)) {

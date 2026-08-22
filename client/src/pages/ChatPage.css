@@ -413,6 +413,30 @@
     font-style: italic;
 }
 
+.markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.9rem;
+}
+
+.markdown-body th,
+.markdown-body td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+}
+
+.markdown-body th {
+    background: var(--bg-surface-container-low);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.markdown-body tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
 .message-content:hover {
     transform: translateY(-1px);
 }

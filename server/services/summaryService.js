@@ -7,7 +7,7 @@ async function generateSummary(chunks) {
     const client = getChatClient();
     if (!client) return 'Document uploaded. Add GROQ_API_KEY to server/.env to enable AI summaries.';
 
-    const context = chunks.slice(0, 6).map(c => c.text).join('\n\n');
+    const context = chunks.slice(0, 3).map(c => c.text).join('\n\n');
 
     try {
         const completion = await callChatCompletionWithFallback(client, {

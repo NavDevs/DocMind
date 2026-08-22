@@ -2,49 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './ChatPage.css';
-
-const formatContent = (text) => {
-    if (!text) return '';
-    return text
-        .split('\n')
-        .map((line, i) => {
-            // Headings
-            const h1 = line.match(/^#\s+(.*)/);
-            if (h1) return <h2 key={i}>{h1[1]}</h2>;
-            const h2 = line.match(/^##\s+(.*)/);
-            if (h2) return <h3 key={i}>{h2[1]}</h3>;
-            const h3 = line.match(/^###\s+(.*)/);
-            if (h3) return <h4 key={i}>{h3[1]}</h4>;
-
-            // Bullet lists
-            const bullet = line.match(/^[-*]\s+(.*)/);
-            if (bullet) return <li key={i}>{parseBold(bullet[1])}</li>;
-
-            // Numbered lists
-            const numbered = line.match(/^\d+\.\s+(.*)/);
-            if (numbered) return <li key={i}>{parseBold(numbered[1])}</li>;
-
-            // Blockquote
-            const quote = line.match(/^>\s+(.*)/);
-            if (quote) return <blockquote key={i}>{parseBold(quote[1])}</blockquote>;
-
-            // Empty line → spacer
-            if (!line.trim()) return <div key={i} style={{ height: '0.5em' }} />;
-
-            return <p key={i}>{parseBold(line)}</p>;
-        });
-};
-
-function parseBold(line) {
-    if (!line.includes('**') && !line.includes('`')) return line;
-    const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
-    return parts.map((part, j) => {
-        if (part.startsWith('**') && part.endsWith('**')) return <strong key={j}>{part.slice(2, -2)}</strong>;
-        if (part.startsWith('`') && part.endsWith('`')) return <code key={j}>{part.slice(1, -1)}</code>;
-        return <span key={j}>{part}</span>;
-    });
-}
 
 const SUGGESTED = [
     'Summarize this document',
@@ -93,14 +53,16 @@ const SourcePanel = ({ sources, onClose }) => {
 
 const getTypingSpeed = (length) => {
     const minDuration = 1.2;
-    const maxDuration = 7;
+    const maxDuration = 18; // Increased so long text doesn't type blindingly fast
     const duration = Math.min(maxDuration, Math.max(minDuration, length / 90));
     return length / duration;
 };
 
 const StaticAssistantMessage = ({ content }) => (
     <div className="message-content">
-        {formatContent(content)}
+        <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-body">
+            {content}
+        </ReactMarkdown>
     </div>
 );
 
@@ -159,10 +121,9 @@ const AnimatedTypewriterMessage = ({ msg, onUpdate }) => {
 
     return (
         <div className="message-content typewriter-active">
-            <span className="typewriter-line">
-                {displayedText.replace(/[\s\n]+$/, '')}
-                <span className="typewriter-cursor" aria-hidden="true">|</span>
-            </span>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-body typewriter-line">
+                {displayedText + ' █'}
+            </ReactMarkdown>
         </div>
     );
 };
