@@ -413,34 +413,40 @@
     font-style: italic;
 }
 
-/* ── Markdown Table Wrapper ── */
-.md-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    margin: 18px 0;
-}
-
 .markdown-body table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 18px 0;
     font-size: 0.88rem;
-    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .markdown-body th,
 .markdown-body td {
-    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.22);
+    border-right: 1.5px solid rgba(255, 255, 255, 0.22);
     padding: 11px 16px;
     text-align: left;
     vertical-align: top;
     line-height: 1.55;
 }
 
+.markdown-body th:last-child,
+.markdown-body td:last-child {
+    border-right: none;
+}
+
+.markdown-body tr:last-child td {
+    border-bottom: none;
+}
+
 .markdown-body thead tr {
-    background: linear-gradient(135deg, rgba(103, 80, 164, 0.7), rgba(103, 80, 164, 0.45));
+    background: linear-gradient(135deg, rgba(103, 80, 164, 0.5), rgba(103, 80, 164, 0.3));
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .markdown-body th {
@@ -449,7 +455,6 @@
     font-size: 0.82rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    border-color: rgba(255, 255, 255, 0.35);
 }
 
 .markdown-body tbody tr {
@@ -457,12 +462,37 @@
 }
 
 .markdown-body tbody tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.055);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .markdown-body tbody tr:hover {
-    background: rgba(103, 80, 164, 0.22);
+    background: rgba(103, 80, 164, 0.18);
     transition: background 0.15s ease;
+}
+
+/* Light mode overrides */
+[data-theme="light"] .markdown-body table,
+:root:not([data-theme="dark"]) .markdown-body table {
+    border: 1.5px solid rgba(0, 0, 0, 0.14);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .markdown-body th,
+[data-theme="light"] .markdown-body td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+    border-right: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+[data-theme="light"] .markdown-body thead tr {
+    background: linear-gradient(135deg, rgba(103, 80, 164, 0.15), rgba(103, 80, 164, 0.08));
+}
+
+[data-theme="light"] .markdown-body th {
+    color: var(--accent);
+}
+
+[data-theme="light"] .markdown-body tbody tr:hover {
+    background: rgba(103, 80, 164, 0.07);
 }
 
 .message-content:hover {
