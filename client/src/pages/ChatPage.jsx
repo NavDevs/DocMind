@@ -92,38 +92,64 @@ const SourcePanel = ({ sources, onClose }) => {
 };
 
 const TypewriterMessage = ({ msg, isLastAi, onUpdate }) => {
-    const [displayedText, setDisplayedText] = useState(isLastAi ? "" : msg.content);
+    const [displayedText, setDisplayedText] = useState(isLastAi ? '' : msg.content);
+    const [isTyping, setIsTyping] = useState(isLastAi);
+    const rafRef = useRef(null);
+    const charIndexRef = useRef(0);
+    const lastScrollRef = useRef(0);
 
     useEffect(() => {
         if (!isLastAi) {
             setDisplayedText(msg.content);
+            setIsTyping(false);
             return;
         }
 
-        let currentIndex = displayedText.length;
-        if (currentIndex >= msg.content.length) {
-            setDisplayedText(msg.content);
-            return;
-        }
+        const content = msg.content;
+        charIndexRef.current = 0;
+        setDisplayedText('');
+        setIsTyping(true);
 
-        const interval = setInterval(() => {
-            currentIndex += 12;
-            if (currentIndex >= msg.content.length) {
-                currentIndex = msg.content.length;
-                clearInterval(interval);
+        let lastTime = null;
+        let carry = 0;
+        const CHARS_PER_SEC = 52;
+
+        const animate = (timestamp) => {
+            if (!lastTime) lastTime = timestamp;
+            const dt = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+
+            carry += CHARS_PER_SEC * dt;
+            if (carry >= 1) {
+                const step = Math.floor(carry);
+                carry -= step;
+                charIndexRef.current = Math.min(content.length, charIndexRef.current + step);
+                setDisplayedText(content.slice(0, charIndexRef.current));
+
+                if (timestamp - lastScrollRef.current > 80) {
+                    lastScrollRef.current = timestamp;
+                    onUpdate?.();
+                }
             }
-            setDisplayedText(msg.content.slice(0, currentIndex));
-            onUpdate();
-        }, 10);
 
-        return () => clearInterval(interval);
-    }, [msg.content, isLastAi]); // We omit onUpdate from dependency array intentionally
+            if (charIndexRef.current < content.length) {
+                rafRef.current = requestAnimationFrame(animate);
+            } else {
+                setIsTyping(false);
+                onUpdate?.();
+            }
+        };
 
-    const dynamicPadding = Math.min(Math.max(16 + (msg.content.length * 0.05), 16), 64);
+        rafRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
+    }, [msg.content, isLastAi]);
 
     return (
-        <div className="message-content" style={{ padding: `${dynamicPadding}px`, transition: 'padding 0.3s ease' }}>
+        <div className={`message-content${isTyping ? ' typewriter-active' : ''}`}>
             {formatContent(displayedText)}
+            {isTyping && <span className="typewriter-cursor" aria-hidden="true" />}
         </div>
     );
 };
