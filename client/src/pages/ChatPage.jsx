@@ -58,9 +58,17 @@ const getTypingSpeed = (length) => {
     return length / duration;
 };
 
+const markdownComponents = {
+    table: ({ node, ...props }) => (
+        <div className="md-table-wrapper">
+            <table {...props} />
+        </div>
+    ),
+};
+
 const StaticAssistantMessage = ({ content }) => (
     <div className="message-content">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-body">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-body" components={markdownComponents}>
             {content}
         </ReactMarkdown>
     </div>
