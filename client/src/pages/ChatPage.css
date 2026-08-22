@@ -449,25 +449,25 @@
 }
 
 /* ── Typewriter ── */
-.message.assistant .message-content p.typewriter-line {
+.message-content.typewriter-active .typewriter-line {
+    display: block;
     margin: 0;
     padding: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
-.message-content.typewriter-active p.typewriter-line::after {
-    content: '';
-    display: inline-block;
-    width: 2px;
-    height: 0.85em;
-    margin-left: 2px;
-    vertical-align: -0.05em;
-    background: var(--accent);
+.typewriter-cursor {
+    display: inline;
+    color: var(--accent);
+    font-weight: 300;
+    margin-left: 1px;
     animation: cursorPulse 1.1s ease-in-out infinite;
 }
 
 @keyframes cursorPulse {
     0%, 100% { opacity: 0.15; }
-    50% { opacity: 0.75; }
+    50% { opacity: 0.85; }
 }
 
 /* ── Typing Indicator ── */

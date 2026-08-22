@@ -159,7 +159,10 @@ const AnimatedTypewriterMessage = ({ msg, onUpdate }) => {
 
     return (
         <div className="message-content typewriter-active">
-            <p className="typewriter-line">{displayedText.replace(/\n+$/, '')}</p>
+            <span className="typewriter-line">
+                {displayedText.replace(/[\s\n]+$/, '')}
+                <span className="typewriter-cursor" aria-hidden="true">|</span>
+            </span>
         </div>
     );
 };
