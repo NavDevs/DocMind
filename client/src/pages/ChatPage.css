@@ -427,8 +427,8 @@
 
 .markdown-body th,
 .markdown-body td {
-    border-bottom: 1.5px solid rgba(255, 255, 255, 0.22);
-    border-right: 1.5px solid rgba(255, 255, 255, 0.22);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    border-right: 1px solid rgba(255, 255, 255, 0.10);
     padding: 11px 16px;
     text-align: left;
     vertical-align: top;
