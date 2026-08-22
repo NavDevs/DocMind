@@ -415,54 +415,26 @@
 
 .markdown-body table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 18px 0;
-    font-size: 0.88rem;
-    border: 1.5px solid var(--border-strong, var(--border));
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.9rem;
 }
 
 .markdown-body th,
 .markdown-body td {
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    padding: 11px 16px;
+    border: 1px solid var(--border);
+    padding: 10px 14px;
     text-align: left;
-    vertical-align: top;
-    line-height: 1.5;
-}
-
-.markdown-body th:last-child,
-.markdown-body td:last-child {
-    border-right: none;
-}
-
-.markdown-body tr:last-child td {
-    border-bottom: none;
-}
-
-.markdown-body thead tr {
-    background: linear-gradient(135deg, var(--accent-container), var(--bg-surface-container-low));
 }
 
 .markdown-body th {
+    background: var(--bg-surface-container-low);
     font-weight: 700;
     color: var(--text-primary);
-    font-size: 0.82rem;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
 }
 
-.markdown-body tbody tr:nth-child(even) {
-    background: var(--bg-surface-container-low, rgba(103, 80, 164, 0.04));
-}
-
-.markdown-body tbody tr:hover {
-    background: var(--accent-container, rgba(103, 80, 164, 0.08));
-    transition: background 0.15s ease;
+.markdown-body tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .message-content:hover {
